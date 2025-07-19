@@ -27,8 +27,11 @@ npm run lint:css
 # Update @wordpress packages
 npm run packages-update
 
-# Create plugin zip file
+# Create plugin zip file (files at root level)
 npm run plugin-zip
+
+# Create plugin zip file with proper directory structure (recommended for distribution)
+npm run plugin-zip-folder
 ```
 
 ## Architecture
