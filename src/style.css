@@ -1,0 +1,271 @@
+/* Editor styles */
+.pano-block-editor .pano-images-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.pano-block-editor .pano-images-grid .pano-image-item {
+	position: relative;
+}
+
+.pano-block-editor .pano-images-grid .pano-image-item img {
+	width: 100%;
+	height: 150px;
+	object-fit: cover;
+	border-radius: 4px;
+}
+
+.pano-block-editor .pano-images-grid .pano-image-item button {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+}
+
+.pano-block-editor .pano-stitched-preview {
+	margin-top: 1rem;
+	padding: 1rem;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background: #f9f9f9;
+}
+
+.pano-block-editor .pano-stitched-preview h4 {
+	margin: 0 0 1rem;
+	font-size: 14px;
+}
+
+.pano-block-editor .pano-stitched-preview canvas {
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+/* Frontend styles */
+.wp-block-pano-block-panoramic,
+.pano-block-container {
+	/* Block-level constraints */
+	width: 100%;
+	max-width: 650px !important;
+	box-sizing: border-box;
+	margin: 0 auto;
+	position: relative;
+	contain: layout;
+}
+
+.pano-block-thumbnail {
+	position: relative;
+	cursor: pointer;
+	border-radius: 8px;
+	overflow: hidden;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	max-width: 100%;
+	width: 100%;
+	display: block;
+}
+
+/* Main 3-image thumbnail layout */
+.pano-images-container {
+	display: flex;
+	width: 100%;
+	height: auto;
+	line-height: 0;
+	font-size: 0;
+}
+
+.pano-image-segment {
+	flex: 1;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	display: block;
+	line-height: 0;
+}
+
+.pano-segment-image {
+	width: 100%;
+	height: auto;
+	display: block;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	vertical-align: top;
+	max-width: none;
+	object-fit: cover;
+}
+
+.pano-block-thumbnail:hover,
+.pano-block-thumbnail:focus {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	outline: none;
+}
+
+.pano-block-thumbnail:focus {
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+
+.pano-block-thumbnail .pano-play-overlay {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: rgba(0, 0, 0, 0.7);
+	border-radius: 50%;
+	width: 80px;
+	height: 80px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0.8;
+	transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.pano-block-thumbnail .pano-play-overlay .pano-play-icon {
+	color: white;
+	font-size: 2rem;
+	line-height: 1;
+}
+
+.pano-block-thumbnail:hover .pano-play-overlay {
+	opacity: 1;
+	transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Modal viewer */
+.pano-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.95);
+	z-index: 999999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.pano-modal.active {
+	opacity: 1;
+	visibility: visible;
+}
+
+.pano-modal .pano-viewer-container {
+	position: relative;
+	width: 95%;
+	height: 90%;
+	max-width: none;
+}
+
+.pano-modal .pano-viewer-container .pano-viewer {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	position: relative;
+	cursor: grab;
+	border-radius: 8px;
+	background: #000;
+}
+
+.pano-modal .pano-viewer-container .pano-viewer.dragging {
+	cursor: grabbing;
+}
+
+.pano-modal .pano-viewer-container .pano-viewer canvas {
+	display: block;
+	max-width: none;
+	max-height: none;
+}
+
+.pano-modal .pano-viewer-container .pano-controls {
+	position: absolute;
+	bottom: -50px;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	gap: 0.5rem;
+}
+
+.pano-modal .pano-viewer-container .pano-controls button {
+	background: rgba(255, 255, 255, 0.9);
+	border: none;
+	border-radius: 4px;
+	padding: 8px 12px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: background 0.3s ease;
+	min-width: 40px;
+}
+
+.pano-modal .pano-viewer-container .pano-controls button:hover {
+	background: rgba(255, 255, 255, 1);
+}
+
+.pano-modal .pano-viewer-container .pano-controls button:focus {
+	outline: 2px solid #007cba;
+	outline-offset: 2px;
+}
+
+.pano-modal .pano-viewer-container .pano-close {
+	position: absolute;
+	top: -50px;
+	right: 0;
+	background: rgba(255, 255, 255, 0.9);
+	border: none;
+	border-radius: 4px;
+	width: 40px;
+	height: 40px;
+	cursor: pointer;
+	font-size: 20px;
+	font-weight: bold;
+	transition: background 0.3s ease;
+}
+
+.pano-modal .pano-viewer-container .pano-close:hover {
+	background: rgba(255, 255, 255, 1);
+}
+
+.pano-modal .pano-viewer-container .pano-close:focus {
+	outline: 2px solid #007cba;
+	outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.pano-modal .pano-viewer-container {
+		width: 95%;
+		height: 70%;
+	}
+
+	.pano-modal .pano-viewer-container .pano-controls {
+		bottom: -80px;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.pano-modal .pano-viewer-container .pano-controls button {
+		padding: 10px 16px;
+		font-size: 16px;
+	}
+
+	.pano-modal .pano-viewer-container .pano-close {
+		top: -60px;
+		width: 50px;
+		height: 50px;
+		font-size: 24px;
+	}
+
+	.pano-block-container .pano-block-thumbnail .pano-play-overlay {
+		width: 60px;
+		height: 60px;
+	}
+
+	.pano-block-container .pano-block-thumbnail .pano-play-overlay .pano-play-icon {
+		font-size: 1.5rem;
+	}
+}
