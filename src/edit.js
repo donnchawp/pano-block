@@ -31,7 +31,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		newImages.splice( index, 1 );
 		setAttributes( { images: newImages } );
 	};
-    
+
 	const stitchImages = () => {
 		if ( images.length !== 3 || ! canvasRef.current ) {
 			return;
@@ -50,8 +50,13 @@ export default function Edit( { attributes, setAttributes } ) {
 				} );
 			} )
 		).then( ( loadedImages ) => {
-			const maxHeight = Math.max( ...loadedImages.map( ( img ) => img.height ) );
-			const totalWidth = loadedImages.reduce( ( sum, img ) => sum + img.width, 0 );
+			const maxHeight = Math.max(
+				...loadedImages.map( ( img ) => img.height )
+			);
+			const totalWidth = loadedImages.reduce(
+				( sum, img ) => sum + img.width,
+				0
+			);
 
 			canvas.width = totalWidth;
 			canvas.height = maxHeight;
@@ -70,7 +75,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			stitchImages();
 		}
 	}, [ images ] );
-    
+
 	const blockProps = useBlockProps( {
 		className: 'pano-block-editor',
 	} );
@@ -82,8 +87,13 @@ export default function Edit( { attributes, setAttributes } ) {
 					<TextControl
 						label={ __( 'Alt Text', 'pano-block' ) }
 						value={ altText }
-						onChange={ ( value ) => setAttributes( { altText: value } ) }
-						help={ __( 'Describe the panoramic image for screen readers.', 'pano-block' ) }
+						onChange={ ( value ) =>
+							setAttributes( { altText: value } )
+						}
+						help={ __(
+							'Describe the panoramic image for screen readers.',
+							'pano-block'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -93,7 +103,10 @@ export default function Edit( { attributes, setAttributes } ) {
 					<Placeholder
 						icon="format-gallery"
 						label={ __( 'Panoramic Image', 'pano-block' ) }
-						instructions={ __( 'Select 3 images to create a panoramic view.', 'pano-block' ) }
+						instructions={ __(
+							'Select 3 images to create a panoramic view.',
+							'pano-block'
+						) }
 					>
 						<MediaUploadCheck>
 							<MediaUpload
@@ -103,14 +116,22 @@ export default function Edit( { attributes, setAttributes } ) {
 								gallery={ true }
 								value={ images.map( ( img ) => img.id ) }
 								render={ ( { open } ) => (
-									<Button
-										onClick={ open }
-										variant="primary"
-									>
+									<Button onClick={ open } variant="primary">
 										{ images.length === 0
-											? __( 'Select Images', 'pano-block' )
-											: __( `Add ${ 3 - images.length } more image${ 3 - images.length > 1 ? 's' : '' }`, 'pano-block' )
-										}
+											? __(
+													'Select Images',
+													'pano-block'
+											  )
+											: __(
+													`Add ${
+														3 - images.length
+													} more image${
+														3 - images.length > 1
+															? 's'
+															: ''
+													}`,
+													'pano-block'
+											  ) }
 									</Button>
 								) }
 							/>
@@ -120,7 +141,10 @@ export default function Edit( { attributes, setAttributes } ) {
 					<div className="pano-block-preview">
 						<div className="pano-images-grid">
 							{ images.map( ( image, index ) => (
-								<div key={ image.id } className="pano-image-item">
+								<div
+									key={ image.id }
+									className="pano-image-item"
+								>
 									<img src={ image.url } alt={ image.alt } />
 									<Button
 										onClick={ () => removeImage( index ) }
@@ -136,7 +160,10 @@ export default function Edit( { attributes, setAttributes } ) {
 
 						<div className="pano-stitched-preview">
 							<h4>{ __( 'Stitched Preview:', 'pano-block' ) }</h4>
-							<canvas ref={ canvasRef } style={ { maxWidth: '100%', height: 'auto' } } />
+							<canvas
+								ref={ canvasRef }
+								style={ { maxWidth: '100%', height: 'auto' } }
+							/>
 						</div>
 
 						<MediaUploadCheck>
