@@ -44,6 +44,7 @@
 /* Frontend styles */
 .wp-block-pano-block-panoramic,
 .pano-block-container {
+
 	/* Block-level constraints */
 	width: 100%;
 	max-width: 650px !important;
@@ -123,7 +124,7 @@
 }
 
 .pano-block-thumbnail .pano-play-overlay .pano-play-icon {
-	color: white;
+	color: #fff;
 	font-size: 2rem;
 	line-height: 1;
 }
@@ -222,7 +223,7 @@
 	height: 40px;
 	cursor: pointer;
 	font-size: 20px;
-	font-weight: bold;
+	font-weight: 700;
 	transition: background 0.3s ease;
 }
 
@@ -237,6 +238,7 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+
 	.pano-modal .pano-viewer-container {
 		width: 95%;
 		height: 70%;
