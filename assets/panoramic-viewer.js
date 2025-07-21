@@ -49,23 +49,21 @@ class PanoramicViewer {
 
 		document.body.appendChild( this.modal );
 
+		// Cache frequently used elements
 		this.canvas = this.modal.querySelector( 'canvas' );
 		this.ctx = this.canvas.getContext( '2d' );
 		this.viewer = this.modal.querySelector( '.pano-viewer' );
+		this.closeBtn = this.modal.querySelector( '.pano-close' );
+		this.zoomInBtn = this.modal.querySelector( '.pano-zoom-in' );
+		this.zoomOutBtn = this.modal.querySelector( '.pano-zoom-out' );
+		this.zoomResetBtn = this.modal.querySelector( '.pano-zoom-reset' );
+		this.titleEl = this.modal.querySelector( '#pano-viewer-title' );
 
 		// Bind modal events
-		this.modal
-			.querySelector( '.pano-close' )
-			.addEventListener( 'click', () => this.close() );
-		this.modal
-			.querySelector( '.pano-zoom-in' )
-			.addEventListener( 'click', () => this.zoom( 1.2 ) );
-		this.modal
-			.querySelector( '.pano-zoom-out' )
-			.addEventListener( 'click', () => this.zoom( 0.8 ) );
-		this.modal
-			.querySelector( '.pano-zoom-reset' )
-			.addEventListener( 'click', () => this.resetView() );
+		this.closeBtn.addEventListener( 'click', () => this.close() );
+		this.zoomInBtn.addEventListener( 'click', () => this.zoom( 1.2 ) );
+		this.zoomOutBtn.addEventListener( 'click', () => this.zoom( 0.8 ) );
+		this.zoomResetBtn.addEventListener( 'click', () => this.resetView() );
 
 		// Mouse events
 		this.viewer.addEventListener( 'mousedown', ( e ) =>
@@ -125,8 +123,7 @@ class PanoramicViewer {
 		const altText = thumbnail.dataset.alt;
 
 		// Update modal title
-		const title = this.modal.querySelector( '#pano-viewer-title' );
-		title.textContent = altText || 'Panoramic Image Viewer';
+		this.titleEl.textContent = altText || 'Panoramic Image Viewer';
 
 		// Load and stitch images
 		await this.loadImages( imagesData );
