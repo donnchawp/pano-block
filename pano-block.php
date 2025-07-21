@@ -73,20 +73,6 @@ class Pano_Block {
 	private function init_hooks() {
 		add_action( 'init', array( $this, 'pano_block_register_block' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'pano_block_enqueue_frontend_scripts' ) );
-		add_action( 'plugins_loaded', array( $this, 'pano_block_load_textdomain' ) );
-	}
-
-	/**
-	 * Load plugin textdomain.
-	 *
-	 * @since 1.0.0
-	 */
-	public function pano_block_load_textdomain() {
-		load_plugin_textdomain(
-			'pano-block',
-			false,
-			dirname( PANO_BLOCK_PLUGIN_BASENAME ) . '/languages'
-		);
 	}
 
 	/**
