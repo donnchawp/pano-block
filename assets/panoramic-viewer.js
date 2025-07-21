@@ -7,7 +7,7 @@ class PanoramicViewer {
 		this.stitchedCanvas = null;
 		this.isDragging = false;
 		this.startX = 0;
-		this.currentX = 0;
+		this.startY = 0;
 		this.scale = 1;
 		this.minScale = 0.5;
 		this.maxScale = 3;
