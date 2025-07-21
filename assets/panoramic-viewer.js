@@ -7,12 +7,35 @@ class PanoramicViewer {
 		this.stitchedCanvas = null;
 		this.isDragging = false;
 		this.startX = 0;
-		this.currentX = 0;
+		this.startY = 0;
 		this.scale = 1;
 		this.minScale = 0.5;
 		this.maxScale = 3;
 		this.panX = 0;
 		this.panY = 0;
+		this._renderScheduled = false;
+		this._lastImageUrls = null;
+
+		// Bind handler methods
+		this.handleCloseClick = this.close.bind(this);
+		this.handleZoomInClick = () => this.zoom(1.2);
+		this.handleZoomOutClick = () => this.zoom(0.8);
+		this.handleZoomResetClick = () => this.resetView();
+		this.handleViewerMousedown = (e) => this.startDrag(e);
+		this.handleViewerMousemove = (e) => this.drag(e);
+		this.handleViewerMouseup = () => this.endDrag();
+		this.handleViewerMouseleave = () => this.endDrag();
+		this.handleViewerWheel = (e) => this.handleWheel(e);
+		this.handleViewerTouchstart = (e) => this.startTouch(e);
+		this.handleViewerTouchmove = (e) => this.dragTouch(e);
+		this.handleViewerTouchend = () => this.endDrag();
+		this.handleViewerKeydown = (e) => this.handleKeydown(e);
+		this.handleModalKeydown = this.handleModalKeydown.bind(this);
+		this.handleModalClick = (e) => {
+			if (e.target === this.modal) {
+				this.close();
+			}
+		};
 
 		this.init();
 	}
@@ -49,75 +72,61 @@ class PanoramicViewer {
 
 		document.body.appendChild( this.modal );
 
+		// Cache frequently used elements
 		this.canvas = this.modal.querySelector( 'canvas' );
 		this.ctx = this.canvas.getContext( '2d' );
 		this.viewer = this.modal.querySelector( '.pano-viewer' );
+		this.closeBtn = this.modal.querySelector( '.pano-close' );
+		this.zoomInBtn = this.modal.querySelector( '.pano-zoom-in' );
+		this.zoomOutBtn = this.modal.querySelector( '.pano-zoom-out' );
+		this.zoomResetBtn = this.modal.querySelector( '.pano-zoom-reset' );
+		this.titleEl = this.modal.querySelector( '#pano-viewer-title' );
 
 		// Bind modal events
-		this.modal
-			.querySelector( '.pano-close' )
-			.addEventListener( 'click', () => this.close() );
-		this.modal
-			.querySelector( '.pano-zoom-in' )
-			.addEventListener( 'click', () => this.zoom( 1.2 ) );
-		this.modal
-			.querySelector( '.pano-zoom-out' )
-			.addEventListener( 'click', () => this.zoom( 0.8 ) );
-		this.modal
-			.querySelector( '.pano-zoom-reset' )
-			.addEventListener( 'click', () => this.resetView() );
+		this.closeBtn.addEventListener('click', this.handleCloseClick);
+		this.zoomInBtn.addEventListener('click', this.handleZoomInClick);
+		this.zoomOutBtn.addEventListener('click', this.handleZoomOutClick);
+		this.zoomResetBtn.addEventListener('click', this.handleZoomResetClick);
 
 		// Mouse events
-		this.viewer.addEventListener( 'mousedown', ( e ) =>
-			this.startDrag( e )
-		);
-		this.viewer.addEventListener( 'mousemove', ( e ) => this.drag( e ) );
-		this.viewer.addEventListener( 'mouseup', () => this.endDrag() );
-		this.viewer.addEventListener( 'mouseleave', () => this.endDrag() );
-		this.viewer.addEventListener( 'wheel', ( e ) => this.handleWheel( e ) );
+		this.viewer.addEventListener('mousedown', this.handleViewerMousedown);
+		this.viewer.addEventListener('mousemove', this.handleViewerMousemove);
+		this.viewer.addEventListener('mouseup', this.handleViewerMouseup);
+		this.viewer.addEventListener('mouseleave', this.handleViewerMouseleave);
+		this.viewer.addEventListener('wheel', this.handleViewerWheel, { passive: false });
 
 		// Touch events
-		this.viewer.addEventListener( 'touchstart', ( e ) =>
-			this.startTouch( e )
-		);
-		this.viewer.addEventListener( 'touchmove', ( e ) =>
-			this.dragTouch( e )
-		);
-		this.viewer.addEventListener( 'touchend', () => this.endDrag() );
+		this.viewer.addEventListener('touchstart', this.handleViewerTouchstart);
+		this.viewer.addEventListener('touchmove', this.handleViewerTouchmove);
+		this.viewer.addEventListener('touchend', this.handleViewerTouchend);
 
 		// Keyboard events
-		this.viewer.addEventListener( 'keydown', ( e ) =>
-			this.handleKeydown( e )
-		);
-		this.modal.addEventListener( 'keydown', ( e ) =>
-			this.handleModalKeydown( e )
-		);
+		this.viewer.addEventListener('keydown', this.handleViewerKeydown);
 
 		// Click outside to close
-		this.modal.addEventListener( 'click', ( e ) => {
-			if ( e.target === this.modal ) {
-				this.close();
-			}
-		} );
+		this.modal.addEventListener('click', this.handleModalClick);
 	}
 
 	bindEvents() {
-		document.addEventListener( 'DOMContentLoaded', () => {
-			const thumbnails = document.querySelectorAll(
-				'.pano-block-thumbnail'
-			);
-			thumbnails.forEach( ( thumbnail ) => {
-				thumbnail.addEventListener( 'click', ( e ) =>
-					this.openViewer( e.currentTarget )
+		const attach = () => {
+			const thumbnails = document.querySelectorAll('.pano-block-thumbnail');
+			thumbnails.forEach((thumbnail) => {
+				thumbnail.addEventListener('click', (e) =>
+					this.openViewer(e.currentTarget)
 				);
-				thumbnail.addEventListener( 'keydown', ( e ) => {
-					if ( e.key === 'Enter' || e.key === ' ' ) {
+				thumbnail.addEventListener('keydown', (e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
 						e.preventDefault();
-						this.openViewer( e.currentTarget );
+						this.openViewer(e.currentTarget);
 					}
-				} );
-			} );
-		} );
+				});
+			});
+		};
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', attach);
+		} else {
+			attach();
+		}
 	}
 
 	async openViewer( thumbnail ) {
@@ -125,15 +134,36 @@ class PanoramicViewer {
 		const altText = thumbnail.dataset.alt;
 
 		// Update modal title
-		const title = this.modal.querySelector( '#pano-viewer-title' );
-		title.textContent = altText || 'Panoramic Image Viewer';
+		this.titleEl.textContent = altText || 'Panoramic Image Viewer';
 
-		// Load and stitch images
-		await this.loadImages( imagesData );
-		await this.stitchImages();
+		// Remove any previous error message
+		const oldError = this.modal.querySelector('.pano-error');
+		if (oldError) oldError.remove();
+
+		// Check if images have changed
+		const imageUrls = imagesData.map(img => img.url);
+		const shouldRestitch = !this._lastImageUrls || this._lastImageUrls.length !== imageUrls.length || this._lastImageUrls.some((url, i) => url !== imageUrls[i]);
+
+		if (shouldRestitch) {
+			try {
+				await this.loadImages(imagesData);
+				await this.stitchImages();
+				this._lastImageUrls = imageUrls;
+			} catch (err) {
+				const errorDiv = document.createElement('div');
+				errorDiv.className = 'pano-error';
+				errorDiv.setAttribute('aria-live', 'polite');
+				errorDiv.textContent = 'Failed to load panoramic images.';
+				errorDiv.style.color = 'red';
+				errorDiv.style.textAlign = 'center';
+				errorDiv.style.margin = '1em 0';
+				this.modal.querySelector('.pano-viewer-container').prepend(errorDiv);
+				return;
+			}
+		}
 
 		this.resetView();
-		this.modal.classList.add( 'active' );
+		this.modal.classList.add('active');
 
 		// Focus management
 		this.previousFocus = document.activeElement;
@@ -142,31 +172,60 @@ class PanoramicViewer {
 		// Trap focus in modal
 		this.trapFocus();
 
+		// Add Escape key handler to document
+		document.addEventListener('keydown', this.handleModalKeydown);
+
 		// Prevent body scroll
 		document.body.style.overflow = 'hidden';
 	}
 
 	close() {
-		this.modal.classList.remove( 'active' );
+		this.modal.classList.remove('active');
 		document.body.style.overflow = '';
 
+		// Remove Escape key handler from document
+		document.removeEventListener('keydown', this.handleModalKeydown);
+
+		// Only remove event listeners if destroying the modal, not on close
+		// (Keep modal event listeners attached for modal lifetime)
+
 		// Restore focus
-		if ( this.previousFocus ) {
+		if (this.previousFocus) {
 			this.previousFocus.focus();
 		}
 	}
 
 	async loadImages( imagesData ) {
+		const TIMEOUT = 10000; // 10 seconds
 		this.images = await Promise.all(
-			imagesData.map( ( imgData ) => {
-				return new Promise( ( resolve, reject ) => {
+			imagesData.map((imgData) => {
+				return new Promise((resolve, reject) => {
 					const img = new Image();
 					img.crossOrigin = 'anonymous';
-					img.onload = () => resolve( img );
-					img.onerror = reject;
+					let done = false;
+					const timer = setTimeout(() => {
+						if (!done) {
+							done = true;
+							reject(new Error('Image load timeout: ' + imgData.url));
+						}
+					}, TIMEOUT);
+					img.onload = () => {
+						if (!done) {
+							done = true;
+							clearTimeout(timer);
+							resolve(img);
+						}
+					};
+					img.onerror = () => {
+						if (!done) {
+							done = true;
+							clearTimeout(timer);
+							reject(new Error('Image failed to load: ' + imgData.url));
+						}
+					};
 					img.src = imgData.url;
-				} );
-			} )
+				});
+			})
 		);
 	}
 
@@ -218,9 +277,11 @@ class PanoramicViewer {
 
 		const viewerRect = this.viewer.getBoundingClientRect();
 
-		// Set canvas to fill the viewer area
-		this.canvas.width = viewerRect.width;
-		this.canvas.height = viewerRect.height;
+		// Only resize canvas if dimensions have changed
+		if (this.canvas.width !== viewerRect.width || this.canvas.height !== viewerRect.height) {
+			this.canvas.width = viewerRect.width;
+			this.canvas.height = viewerRect.height;
+		}
 
 		// Calculate optimal scale to show the full image height
 		const heightScale = this.canvas.height / this.stitchedCanvas.height;
@@ -233,7 +294,7 @@ class PanoramicViewer {
 		this.panX = 0;
 		this.panY = 0;
 
-		this.render();
+		this.scheduleRender();
 	}
 
 	render() {
@@ -262,47 +323,55 @@ class PanoramicViewer {
 		);
 	}
 
-	startDrag( e ) {
+	scheduleRender() {
+		if (!this._renderScheduled) {
+			this._renderScheduled = true;
+			requestAnimationFrame(() => {
+				this._renderScheduled = false;
+				this.render();
+			});
+		}
+	}
+
+	// Shared pan logic
+	startPan(x, y) {
 		this.isDragging = true;
-		this.startX = e.clientX - this.panX;
-		this.startY = e.clientY - this.panY;
-		this.viewer.classList.add( 'dragging' );
+		this.startX = x - this.panX;
+		this.startY = y - this.panY;
+		this.viewer.classList.add('dragging');
 	}
-
-	drag( e ) {
-		if ( ! this.isDragging ) return;
-
-		this.panX = e.clientX - this.startX;
-		this.panY = e.clientY - this.startY;
-
+	dragPan(x, y) {
+		if (!this.isDragging) return;
+		this.panX = x - this.startX;
+		this.panY = y - this.startY;
 		this.constrainPan();
-		this.render();
+		this.scheduleRender();
 	}
-
-	endDrag() {
+	endPan() {
 		this.isDragging = false;
-		this.viewer.classList.remove( 'dragging' );
+		this.viewer.classList.remove('dragging');
 	}
 
-	startTouch( e ) {
-		if ( e.touches.length === 1 ) {
-			const touch = e.touches[ 0 ];
-			this.isDragging = true;
-			this.startX = touch.clientX - this.panX;
-			this.startY = touch.clientY - this.panY;
+	startDrag(e) {
+		this.startPan(e.clientX, e.clientY);
+	}
+	drag(e) {
+		this.dragPan(e.clientX, e.clientY);
+	}
+	endDrag() {
+		this.endPan();
+	}
+	startTouch(e) {
+		if (e.touches.length === 1) {
+			const touch = e.touches[0];
+			this.startPan(touch.clientX, touch.clientY);
 		}
 		e.preventDefault();
 	}
-
-	dragTouch( e ) {
-		if ( ! this.isDragging || e.touches.length !== 1 ) return;
-
-		const touch = e.touches[ 0 ];
-		this.panX = touch.clientX - this.startX;
-		this.panY = touch.clientY - this.startY;
-
-		this.constrainPan();
-		this.render();
+	dragTouch(e) {
+		if (!this.isDragging || e.touches.length !== 1) return;
+		const touch = e.touches[0];
+		this.dragPan(touch.clientX, touch.clientY);
 		e.preventDefault();
 	}
 
@@ -322,7 +391,7 @@ class PanoramicViewer {
 		if ( newScale !== this.scale ) {
 			this.scale = newScale;
 			this.constrainPan();
-			this.render();
+			this.scheduleRender();
 		}
 	}
 
@@ -351,25 +420,25 @@ class PanoramicViewer {
 				e.preventDefault();
 				this.panX += step;
 				this.constrainPan();
-				this.render();
+				this.scheduleRender();
 				break;
 			case 'ArrowRight':
 				e.preventDefault();
 				this.panX -= step;
 				this.constrainPan();
-				this.render();
+				this.scheduleRender();
 				break;
 			case 'ArrowUp':
 				e.preventDefault();
 				this.panY += step;
 				this.constrainPan();
-				this.render();
+				this.scheduleRender();
 				break;
 			case 'ArrowDown':
 				e.preventDefault();
 				this.panY -= step;
 				this.constrainPan();
-				this.render();
+				this.scheduleRender();
 				break;
 			case '+':
 			case '=':
@@ -420,21 +489,38 @@ class PanoramicViewer {
 }
 
 // Add screen reader only styles
-const srOnlyStyle = document.createElement( 'style' );
-srOnlyStyle.textContent = `
-    .sr-only {
-        position: absolute !important;
-        width: 1px !important;
-        height: 1px !important;
-        padding: 0 !important;
-        margin: -1px !important;
-        overflow: hidden !important;
-        clip: rect(0, 0, 0, 0) !important;
-        white-space: nowrap !important;
-        border: 0 !important;
-    }
-`;
-document.head.appendChild( srOnlyStyle );
+if (!document.getElementById('pano-sr-only-style')) {
+    const srOnlyStyle = document.createElement('style');
+    srOnlyStyle.id = 'pano-sr-only-style';
+    srOnlyStyle.textContent = `
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+    `;
+    document.head.appendChild(srOnlyStyle);
+}
 
-// Initialize viewer
-new PanoramicViewer();
+// Export PanoramicViewer for explicit initialization
+window.PanoramicViewer = PanoramicViewer;
+
+// Optionally, provide a global function to initialize the viewer if needed
+window.initPanoramicViewer = function() {
+    if (!window._panoViewerInstance) {
+        window._panoViewerInstance = new PanoramicViewer();
+    }
+    return window._panoViewerInstance;
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (!window._panoViewerInstance) {
+        window._panoViewerInstance = window.initPanoramicViewer();
+    }
+});
