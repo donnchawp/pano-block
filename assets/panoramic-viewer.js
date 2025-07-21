@@ -230,9 +230,11 @@ class PanoramicViewer {
 
 		const viewerRect = this.viewer.getBoundingClientRect();
 
-		// Set canvas to fill the viewer area
-		this.canvas.width = viewerRect.width;
-		this.canvas.height = viewerRect.height;
+		// Only resize canvas if dimensions have changed
+		if (this.canvas.width !== viewerRect.width || this.canvas.height !== viewerRect.height) {
+			this.canvas.width = viewerRect.width;
+			this.canvas.height = viewerRect.height;
+		}
 
 		// Calculate optimal scale to show the full image height
 		const heightScale = this.canvas.height / this.stitchedCanvas.height;
