@@ -149,6 +149,7 @@ class PanoramicViewer {
 			} catch (err) {
 				const errorDiv = document.createElement('div');
 				errorDiv.className = 'pano-error';
+				errorDiv.setAttribute('aria-live', 'polite');
 				errorDiv.textContent = 'Failed to load panoramic images.';
 				errorDiv.style.color = 'red';
 				errorDiv.style.textAlign = 'center';
