@@ -47,24 +47,24 @@ class PanoramicViewer {
 
 	createModal() {
 		this.modal = document.createElement( 'div' );
-		this.modal.className = 'pano-modal';
+		this.modal.className = 'panoramic-modal';
 		this.modal.setAttribute( 'role', 'dialog' );
 		this.modal.setAttribute( 'aria-modal', 'true' );
-		this.modal.setAttribute( 'aria-labelledby', 'pano-viewer-title' );
+		this.modal.setAttribute( 'aria-labelledby', 'panoramic-viewer-title' );
 
 		this.modal.innerHTML = `
-            <div class="pano-viewer-container">
-                <button class="pano-close" aria-label="Close panoramic viewer" title="Close (Esc)">&times;</button>
-                <h2 id="pano-viewer-title" class="sr-only">Panoramic Image Viewer</h2>
-                <div class="pano-viewer" role="img" tabindex="0" aria-describedby="pano-instructions">
+            <div class="panoramic-viewer-container">
+                <button class="panoramic-close" aria-label="Close panoramic viewer" title="Close (Esc)">&times;</button>
+                <h2 id="panoramic-viewer-title" class="sr-only">Panoramic Image Viewer</h2>
+                <div class="panoramic-viewer" role="img" tabindex="0" aria-describedby="panoramic-instructions">
                     <canvas></canvas>
                 </div>
-                <div class="pano-controls">
-                    <button class="pano-zoom-out" aria-label="Zoom out" title="Zoom out (-)">-</button>
-                    <button class="pano-zoom-reset" aria-label="Reset zoom" title="Reset zoom (0)">Reset</button>
-                    <button class="pano-zoom-in" aria-label="Zoom in" title="Zoom in (+)">+</button>
+                <div class="panoramic-controls">
+                    <button class="panoramic-zoom-out" aria-label="Zoom out" title="Zoom out (-)">-</button>
+                    <button class="panoramic-zoom-reset" aria-label="Reset zoom" title="Reset zoom (0)">Reset</button>
+                    <button class="panoramic-zoom-in" aria-label="Zoom in" title="Zoom in (+)">+</button>
                 </div>
-                <div id="pano-instructions" class="sr-only">
+                <div id="panoramic-instructions" class="sr-only">
                     Use arrow keys or drag to pan the image. Use + and - keys or controls to zoom.
                 </div>
             </div>
@@ -75,12 +75,12 @@ class PanoramicViewer {
 		// Cache frequently used elements
 		this.canvas = this.modal.querySelector( 'canvas' );
 		this.ctx = this.canvas.getContext( '2d' );
-		this.viewer = this.modal.querySelector( '.pano-viewer' );
-		this.closeBtn = this.modal.querySelector( '.pano-close' );
-		this.zoomInBtn = this.modal.querySelector( '.pano-zoom-in' );
-		this.zoomOutBtn = this.modal.querySelector( '.pano-zoom-out' );
-		this.zoomResetBtn = this.modal.querySelector( '.pano-zoom-reset' );
-		this.titleEl = this.modal.querySelector( '#pano-viewer-title' );
+		this.viewer = this.modal.querySelector( '.panoramic-viewer' );
+		this.closeBtn = this.modal.querySelector( '.panoramic-close' );
+		this.zoomInBtn = this.modal.querySelector( '.panoramic-zoom-in' );
+		this.zoomOutBtn = this.modal.querySelector( '.panoramic-zoom-out' );
+		this.zoomResetBtn = this.modal.querySelector( '.panoramic-zoom-reset' );
+		this.titleEl = this.modal.querySelector( '#panoramic-viewer-title' );
 
 		// Bind modal events
 		this.closeBtn.addEventListener('click', this.handleCloseClick);
@@ -109,7 +109,7 @@ class PanoramicViewer {
 
 	bindEvents() {
 		const attach = () => {
-			const thumbnails = document.querySelectorAll('.pano-block-thumbnail');
+			const thumbnails = document.querySelectorAll('.panoramic-image-block-thumbnail');
 			thumbnails.forEach((thumbnail) => {
 				thumbnail.addEventListener('click', (e) =>
 					this.openViewer(e.currentTarget)
@@ -137,7 +137,7 @@ class PanoramicViewer {
 		this.titleEl.textContent = altText || 'Panoramic Image Viewer';
 
 		// Remove any previous error message
-		const oldError = this.modal.querySelector('.pano-error');
+		const oldError = this.modal.querySelector('.panoramic-error');
 		if (oldError) oldError.remove();
 
 		// Check if images have changed
@@ -151,13 +151,13 @@ class PanoramicViewer {
 				this._lastImageUrls = imageUrls;
 			} catch (err) {
 				const errorDiv = document.createElement('div');
-				errorDiv.className = 'pano-error';
+				errorDiv.className = 'panoramic-error';
 				errorDiv.setAttribute('aria-live', 'polite');
 				errorDiv.textContent = 'Failed to load panoramic images.';
 				errorDiv.style.color = 'red';
 				errorDiv.style.textAlign = 'center';
 				errorDiv.style.margin = '1em 0';
-				this.modal.querySelector('.pano-viewer-container').prepend(errorDiv);
+				this.modal.querySelector('.panoramic-viewer-container').prepend(errorDiv);
 				return;
 			}
 		}

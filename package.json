@@ -10,7 +10,7 @@
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
-		"plugin-zip-folder": "npm run build && rm -rf temp pano-block.zip && mkdir -p temp/pano-block && cp -r build assets pano-block.php block.json readme.txt README.md temp/pano-block/ && cd temp && zip -r ../pano-block.zip pano-block && cd .. && rm -rf temp",
+		"plugin-zip-folder": "npm run build && rm -rf temp panoramic-image-block.zip && mkdir -p temp/panoramic-image-block && cp -r build assets panoramic-image-block.php block.json readme.txt README.md temp/panoramic-image-block/ && cd temp && zip -r ../panoramic-image-block.zip panoramic-image-block && cd .. && rm -rf temp",
 		"start": "wp-scripts start"
 	},
 	"keywords": [
@@ -42,7 +42,7 @@
 	"files": [
 		"build",
 		"assets",
-		"pano-block.php",
+		"panoramic-image-block.php",
 		"block.json",
 		"readme.txt",
 		"README.md"

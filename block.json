@@ -1,14 +1,14 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "pano-block/panoramic",
+	"name": "panoramic-image-block/panoramic",
 	"title": "Panoramic Image Block",
 	"category": "media",
 	"icon": "format-gallery",
 	"description": "Display a panoramic image created from 3 stitched images.",
 	"keywords": [ "panorama", "panoramic", "image", "gallery", "360" ],
 	"version": "1.0.0",
-	"textdomain": "pano-block",
+	"textdomain": "panoramic-image-block",
 	"supports": {
 		"html": false,
 		"align": [ "wide", "full" ],

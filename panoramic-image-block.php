@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Panoramic Image Block
- * Plugin URI: https://github.com/donnchawp/pano-block
+ * Plugin URI: https://github.com/donnchawp/panoramic-image-block
  * Description: A WordPress block to display panoramic images created from 3 images.
  * Version: 1.0.0
  * Author: Donncha O Caoimh
@@ -23,23 +23,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants.
-define( 'PANO_BLOCK_VERSION', '1.0.0' );
-define( 'PANO_BLOCK_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'PANO_BLOCK_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'PANO_BLOCK_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+define( 'PANORAMIC_IMAGE_BLOCK_VERSION', '1.0.0' );
+define( 'PANORAMIC_IMAGE_BLOCK_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'PANORAMIC_IMAGE_BLOCK_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'PANORAMIC_IMAGE_BLOCK_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
- * Main Pano Block Plugin Class
+ * Main Panoramic Image Block Plugin Class
  *
  * @since 1.0.0
  */
-class Pano_Block {
+class Panoramic_Image_Block {
 
 	/**
 	 * Plugin instance.
 	 *
 	 * @since 1.0.0
-	 * @var Pano_Block
+	 * @var Panoramic_Image_Block
 	 */
 	private static $instance = null;
 
@@ -47,7 +47,7 @@ class Pano_Block {
 	 * Get plugin instance.
 	 *
 	 * @since 1.0.0
-	 * @return Pano_Block
+	 * @return Panoramic_Image_Block
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -71,8 +71,8 @@ class Pano_Block {
 	 * @since 1.0.0
 	 */
 	private function init_hooks() {
-		add_action( 'init', array( $this, 'pano_block_register_block' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'pano_block_enqueue_frontend_scripts' ) );
+		add_action( 'init', array( $this, 'panoramic_image_block_register_block' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'panoramic_image_block_enqueue_frontend_scripts' ) );
 	}
 
 	/**
@@ -80,15 +80,15 @@ class Pano_Block {
 	 *
 	 * @since 1.0.0
 	 */
-	public function pano_block_register_block() {
+	public function panoramic_image_block_register_block() {
 		if ( ! function_exists( 'register_block_type' ) ) {
 			return;
 		}
 
 		register_block_type(
-			PANO_BLOCK_PLUGIN_DIR . 'block.json',
+			PANORAMIC_IMAGE_BLOCK_PLUGIN_DIR . 'block.json',
 			array(
-				'render_callback' => array( $this, 'pano_block_render_block' ),
+				'render_callback' => array( $this, 'panoramic_image_block_render_block' ),
 			)
 		);
 	}
@@ -102,19 +102,19 @@ class Pano_Block {
 	 * @param object $block      Block object.
 	 * @return string Rendered block HTML.
 	 */
-	public function pano_block_render_block( $attributes, $content, $block ) {
+	public function panoramic_image_block_render_block( $attributes, $content, $block ) {
 		if ( empty( $attributes['images'] ) || ! is_array( $attributes['images'] ) || count( $attributes['images'] ) !== 3 ) {
 			return '<p>' . esc_html__( 'Please select 3 images to create a panoramic view.', 'panoramic-image-block' ) . '</p>';
 		}
 
 		$images = $attributes['images'];
 		$alt_text = sanitize_text_field( $attributes['altText'] ?? '' );
-		$block_id = 'pano-block-' . wp_generate_uuid4();
+		$block_id = 'panoramic-image-block-' . wp_generate_uuid4();
 
 		// Get the block wrapper attributes to ensure proper width constraints.
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
-				'class' => 'pano-block-container',
+				'class' => 'panoramic-image-block-container',
 				'id'    => $block_id,
 			)
 		);
@@ -122,7 +122,7 @@ class Pano_Block {
 		ob_start();
 		?>
 		<div <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-			<div class="pano-block-thumbnail"
+			<div class="panoramic-image-block-thumbnail"
 				data-images="<?php echo esc_attr( wp_json_encode( $images ) ); ?>"
 				data-alt="<?php echo esc_attr( $alt_text ); ?>"
 				role="button"
@@ -130,7 +130,7 @@ class Pano_Block {
 				aria-label="<?php echo esc_attr( $alt_text ? $alt_text : __( 'Open panoramic image viewer', 'panoramic-image-block' ) ); ?>">
 				
 				<!-- 3 images side by side as the main thumbnail -->
-				<div style='display: flex; flex-direction: row; gap: 0px;' class="pano-images-container">
+				<div style='display: flex; flex-direction: row; gap: 0px;' class="panoramic-images-container">
 					<?php foreach ( $images as $index => $image ) : ?>
 						<?php 
 						// Create custom alt text with segment number
@@ -147,14 +147,14 @@ class Pano_Block {
 						// Only render if we have a valid attachment ID
 						if ( $attachment_id ) :
 							?>
-							<div style="max-width:100%;height:auto;" class="pano-image-segment" data-index="<?php echo esc_attr( $index ); ?>">
+							<div style="max-width:100%;height:auto;" class="panoramic-image-segment" data-index="<?php echo esc_attr( $index ); ?>">
 								<?php
 								echo wp_get_attachment_image(
 									$attachment_id,
 									'large',
 									false,
 									array(
-										'class' => 'pano-segment-image',
+										'class' => 'panoramic-segment-image',
 										'alt'   => $segment_alt,
 									)
 								);
@@ -167,8 +167,8 @@ class Pano_Block {
 				</div>
 				
 				<!-- Play overlay for JavaScript interaction -->
-				<div class="pano-play-overlay">
-					<span class="pano-play-icon" aria-hidden="true">⚬</span>
+				<div class="panoramic-play-overlay">
+					<span class="panoramic-play-icon" aria-hidden="true">⚬</span>
 				</div>
 			</div>
 		</div>
@@ -183,7 +183,7 @@ class Pano_Block {
 	 * @param array $images Array of image URLs.
 	 * @return string SVG data URL.
 	 */
-	private function pano_block_generate_stitched_image_data( $images ) {
+	private function panoramic_image_block_generate_stitched_image_data( $images ) {
 		// Return a data attribute that JavaScript will use to stitch the images.
 		// This way we avoid server-side image processing and let the browser handle it.
 		$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" viewBox="0 0 800 200">
@@ -202,33 +202,33 @@ class Pano_Block {
 	 *
 	 * @since 1.0.0
 	 */
-	public function pano_block_enqueue_frontend_scripts() {
-		if ( ! has_block( 'pano-block/panoramic' ) ) {
+	public function panoramic_image_block_enqueue_frontend_scripts() {
+		if ( ! has_block( 'panoramic-image-block/panoramic' ) ) {
 			return;
 		}
 
 		wp_enqueue_script(
-			'pano-block-viewer',
-			PANO_BLOCK_PLUGIN_URL . 'assets/panoramic-viewer.js',
+			'panoramic-image-block-viewer',
+			PANORAMIC_IMAGE_BLOCK_PLUGIN_URL . 'assets/panoramic-viewer.js',
 			array(),
-			PANO_BLOCK_VERSION,
+			PANORAMIC_IMAGE_BLOCK_VERSION,
 			true
 		);
 
 		wp_enqueue_style(
-			'pano-block-style',
-			PANO_BLOCK_PLUGIN_URL . 'build/style-index.css',
+			'panoramic-image-block-style',
+			PANORAMIC_IMAGE_BLOCK_PLUGIN_URL . 'build/style-index.css',
 			array(),
-			PANO_BLOCK_VERSION
+			PANORAMIC_IMAGE_BLOCK_VERSION
 		);
 
 		// Localize script for translations and AJAX.
 		wp_localize_script(
-			'pano-block-viewer',
-			'panoBlockData',
+			'panoramic-image-block-viewer',
+			'panoramicImageBlockData',
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( 'pano_block_nonce' ),
+				'nonce'   => wp_create_nonce( 'panoramic_image_block_nonce' ),
 				'strings' => array(
 					'loading' => __( 'Loading panoramic view...', 'panoramic-image-block' ),
 					'error'   => __( 'Error loading panoramic view.', 'panoramic-image-block' ),
@@ -243,33 +243,34 @@ class Pano_Block {
  *
  * @since 1.0.0
  */
-function pano_block_activate() {
+function panoramic_image_block_activate() {
 	// Add activation logic here if needed.
 	flush_rewrite_rules();
 }
-register_activation_hook( __FILE__, 'pano_block_activate' );
+register_activation_hook( __FILE__, 'panoramic_image_block_activate' );
 
 /**
  * Plugin deactivation hook.
  *
  * @since 1.0.0
  */
-function pano_block_deactivate() {
+function panoramic_image_block_deactivate() {
 	// Add deactivation logic here if needed.
 	flush_rewrite_rules();
 }
-register_deactivation_hook( __FILE__, 'pano_block_deactivate' );
+register_deactivation_hook( __FILE__, 'panoramic_image_block_deactivate' );
 
 /**
  * Plugin uninstall hook.
  *
  * @since 1.0.0
  */
-function pano_block_uninstall() {
+function panoramic_image_block_uninstall() {
 	// Add uninstall logic here if needed.
 	// This function is called when the plugin is deleted.
 }
-register_uninstall_hook( __FILE__, 'pano_block_uninstall' );
+register_uninstall_hook( __FILE__, 'panoramic_image_block_uninstall' );
 
 // Initialize the plugin.
-Pano_Block::get_instance();
+Panoramic_Image_Block::get_instance();
+
