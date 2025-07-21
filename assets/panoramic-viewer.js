@@ -93,7 +93,7 @@ class PanoramicViewer {
 		this.viewer.addEventListener('mousemove', this.handleViewerMousemove);
 		this.viewer.addEventListener('mouseup', this.handleViewerMouseup);
 		this.viewer.addEventListener('mouseleave', this.handleViewerMouseleave);
-		this.viewer.addEventListener('wheel', this.handleViewerWheel);
+		this.viewer.addEventListener('wheel', this.handleViewerWheel, { passive: false });
 
 		// Touch events
 		this.viewer.addEventListener('touchstart', this.handleViewerTouchstart);
