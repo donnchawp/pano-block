@@ -133,14 +133,29 @@ class PanoramicViewer {
 		// Update modal title
 		this.titleEl.textContent = altText || 'Panoramic Image Viewer';
 
+		// Remove any previous error message
+		const oldError = this.modal.querySelector('.pano-error');
+		if (oldError) oldError.remove();
+
 		// Check if images have changed
 		const imageUrls = imagesData.map(img => img.url);
 		const shouldRestitch = !this._lastImageUrls || this._lastImageUrls.length !== imageUrls.length || this._lastImageUrls.some((url, i) => url !== imageUrls[i]);
 
 		if (shouldRestitch) {
-			await this.loadImages(imagesData);
-			await this.stitchImages();
-			this._lastImageUrls = imageUrls;
+			try {
+				await this.loadImages(imagesData);
+				await this.stitchImages();
+				this._lastImageUrls = imageUrls;
+			} catch (err) {
+				const errorDiv = document.createElement('div');
+				errorDiv.className = 'pano-error';
+				errorDiv.textContent = 'Failed to load panoramic images.';
+				errorDiv.style.color = 'red';
+				errorDiv.style.textAlign = 'center';
+				errorDiv.style.margin = '1em 0';
+				this.modal.querySelector('.pano-viewer-container').prepend(errorDiv);
+				return;
+			}
 		}
 
 		this.resetView();
@@ -177,16 +192,36 @@ class PanoramicViewer {
 	}
 
 	async loadImages( imagesData ) {
+		const TIMEOUT = 10000; // 10 seconds
 		this.images = await Promise.all(
-			imagesData.map( ( imgData ) => {
-				return new Promise( ( resolve, reject ) => {
+			imagesData.map((imgData) => {
+				return new Promise((resolve, reject) => {
 					const img = new Image();
 					img.crossOrigin = 'anonymous';
-					img.onload = () => resolve( img );
-					img.onerror = reject;
+					let done = false;
+					const timer = setTimeout(() => {
+						if (!done) {
+							done = true;
+							reject(new Error('Image load timeout: ' + imgData.url));
+						}
+					}, TIMEOUT);
+					img.onload = () => {
+						if (!done) {
+							done = true;
+							clearTimeout(timer);
+							resolve(img);
+						}
+					};
+					img.onerror = () => {
+						if (!done) {
+							done = true;
+							clearTimeout(timer);
+							reject(new Error('Image failed to load: ' + imgData.url));
+						}
+					};
 					img.src = imgData.url;
-				} );
-			} )
+				});
+			})
 		);
 	}
 
