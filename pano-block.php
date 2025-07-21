@@ -7,7 +7,7 @@
  * Author: Donncha O Caoimh
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: pano-block
+ * Text Domain: panoramic-image-block
  * Requires at least: 6.0
  * Requires PHP: 7.4
  *
@@ -104,7 +104,7 @@ class Pano_Block {
 	 */
 	public function pano_block_render_block( $attributes, $content, $block ) {
 		if ( empty( $attributes['images'] ) || ! is_array( $attributes['images'] ) || count( $attributes['images'] ) !== 3 ) {
-			return '<p>' . esc_html__( 'Please select 3 images to create a panoramic view.', 'pano-block' ) . '</p>';
+			return '<p>' . esc_html__( 'Please select 3 images to create a panoramic view.', 'panoramic-image-block' ) . '</p>';
 		}
 
 		$images = $attributes['images'];
@@ -127,7 +127,7 @@ class Pano_Block {
 				data-alt="<?php echo esc_attr( $alt_text ); ?>"
 				role="button"
 				tabindex="0"
-				aria-label="<?php echo esc_attr( $alt_text ? $alt_text : __( 'Open panoramic image viewer', 'pano-block' ) ); ?>">
+				aria-label="<?php echo esc_attr( $alt_text ? $alt_text : __( 'Open panoramic image viewer', 'panoramic-image-block' ) ); ?>">
 				
 				<!-- 3 images side by side as the main thumbnail -->
 				<div style='display: flex; flex-direction: row; gap: 0px;' class="pano-images-container">
@@ -190,7 +190,7 @@ class Pano_Block {
 			<rect width="800" height="200" fill="#f0f0f0"/>
 			<text x="400" y="100" text-anchor="middle" dominant-baseline="central" 
 				font-family="Arial, sans-serif" font-size="16" fill="#666">
-				' . esc_html__( 'Panoramic Preview (3 images stitched)', 'pano-block' ) . '
+				' . esc_html__( 'Panoramic Preview (3 images stitched)', 'panoramic-image-block' ) . '
 			</text>
 		</svg>';
 
@@ -230,8 +230,8 @@ class Pano_Block {
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'pano_block_nonce' ),
 				'strings' => array(
-					'loading' => __( 'Loading panoramic view...', 'pano-block' ),
-					'error'   => __( 'Error loading panoramic view.', 'pano-block' ),
+					'loading' => __( 'Loading panoramic view...', 'panoramic-image-block' ),
+					'error'   => __( 'Error loading panoramic view.', 'panoramic-image-block' ),
 				),
 			)
 		);
