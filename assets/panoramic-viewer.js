@@ -14,6 +14,7 @@ class PanoramicViewer {
 		this.panX = 0;
 		this.panY = 0;
 		this._renderScheduled = false;
+		this._lastImageUrls = null;
 
 		// Bind handler methods
 		this.handleCloseClick = this.close.bind(this);
@@ -132,12 +133,18 @@ class PanoramicViewer {
 		// Update modal title
 		this.titleEl.textContent = altText || 'Panoramic Image Viewer';
 
-		// Load and stitch images
-		await this.loadImages( imagesData );
-		await this.stitchImages();
+		// Check if images have changed
+		const imageUrls = imagesData.map(img => img.url);
+		const shouldRestitch = !this._lastImageUrls || this._lastImageUrls.length !== imageUrls.length || this._lastImageUrls.some((url, i) => url !== imageUrls[i]);
+
+		if (shouldRestitch) {
+			await this.loadImages(imagesData);
+			await this.stitchImages();
+			this._lastImageUrls = imageUrls;
+		}
 
 		this.resetView();
-		this.modal.classList.add( 'active' );
+		this.modal.classList.add('active');
 
 		// Focus management
 		this.previousFocus = document.activeElement;
