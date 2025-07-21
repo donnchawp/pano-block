@@ -77,22 +77,22 @@ export default function Edit( { attributes, setAttributes } ) {
 	}, [ images ] );
 
 	const blockProps = useBlockProps( {
-		className: 'pano-block-editor',
+		className: 'panoramic-image-block-editor',
 	} );
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Panoramic Settings', 'pano-block' ) }>
+				<PanelBody title={ __( 'Panoramic Settings', 'panoramic-image-block' ) }>
 					<TextControl
-						label={ __( 'Alt Text', 'pano-block' ) }
+						label={ __( 'Alt Text', 'panoramic-image-block' ) }
 						value={ altText }
 						onChange={ ( value ) =>
 							setAttributes( { altText: value } )
 						}
 						help={ __(
 							'Describe the panoramic image for screen readers.',
-							'pano-block'
+							'panoramic-image-block'
 						) }
 					/>
 				</PanelBody>
@@ -102,10 +102,10 @@ export default function Edit( { attributes, setAttributes } ) {
 				{ images.length < 3 ? (
 					<Placeholder
 						icon="format-gallery"
-						label={ __( 'Panoramic Image', 'pano-block' ) }
+						label={ __( 'Panoramic Image', 'panoramic-image-block' ) }
 						instructions={ __(
 							'Select 3 images to create a panoramic view.',
-							'pano-block'
+							'panoramic-image-block'
 						) }
 					>
 						<MediaUploadCheck>
@@ -120,7 +120,7 @@ export default function Edit( { attributes, setAttributes } ) {
 										{ images.length === 0
 											? __(
 													'Select Images',
-													'pano-block'
+													'panoramic-image-block'
 											  )
 											: __(
 													`Add ${
@@ -130,7 +130,7 @@ export default function Edit( { attributes, setAttributes } ) {
 															? 's'
 															: ''
 													}`,
-													'pano-block'
+													'panoramic-image-block'
 											  ) }
 									</Button>
 								) }
@@ -138,12 +138,12 @@ export default function Edit( { attributes, setAttributes } ) {
 						</MediaUploadCheck>
 					</Placeholder>
 				) : (
-					<div className="pano-block-preview">
-						<div className="pano-images-grid">
+					<div className="panoramic-image-block-preview">
+						<div className="panoramic-images-grid">
 							{ images.map( ( image, index ) => (
 								<div
 									key={ image.id }
-									className="pano-image-item"
+									className="panoramic-image-item"
 								>
 									<img src={ image.url } alt={ image.alt } />
 									<Button
@@ -152,14 +152,14 @@ export default function Edit( { attributes, setAttributes } ) {
 										isDestructive
 										size="small"
 									>
-										{ __( 'Remove', 'pano-block' ) }
+										{ __( 'Remove', 'panoramic-image-block' ) }
 									</Button>
 								</div>
 							) ) }
 						</div>
 
-						<div className="pano-stitched-preview">
-							<h4>{ __( 'Stitched Preview:', 'pano-block' ) }</h4>
+						<div className="panoramic-stitched-preview">
+							<h4>{ __( 'Stitched Preview:', 'panoramic-image-block' ) }</h4>
 							<canvas
 								ref={ canvasRef }
 								style={ { maxWidth: '100%', height: 'auto' } }
@@ -178,7 +178,7 @@ export default function Edit( { attributes, setAttributes } ) {
 										onClick={ open }
 										variant="secondary"
 									>
-										{ __( 'Replace Images', 'pano-block' ) }
+										{ __( 'Replace Images', 'panoramic-image-block' ) }
 									</Button>
 								) }
 							/>

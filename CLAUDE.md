@@ -37,13 +37,13 @@ npm run plugin-zip-folder
 ## Architecture
 
 ### Core Components
-- **Main Plugin File**: `pano-block.php` - PHP class that registers the block and handles server-side rendering
+- **Main Plugin File**: `panoranmic-image-block.php` - PHP class that registers the block and handles server-side rendering
 - **Block Configuration**: `block.json` - Defines block attributes, supports, and file references
 - **Frontend Viewer**: `assets/panoramic-viewer.js` - Interactive panoramic viewer functionality
 - **Block Editor Components**: `src/edit.js`, `src/save.js`, `src/index.js` - Gutenberg editor integration
 
 ### Block Structure
-- **Block Name**: `pano-block/panoramic`
+- **Block Name**: `panoramic-image-block/panoramic`
 - **Required Images**: Exactly 3 images for panoramic stitching
 - **Attributes**: `images` (array of 3 image objects), `altText` (string)
 - **Frontend Rendering**: PHP render callback generates thumbnail with data attributes for JS viewer
@@ -61,7 +61,7 @@ npm run plugin-zip-folder
 - Follows WordPress Block API v3 standards
 - Server-side rendering with `render_callback`
 - Proper enqueueing of scripts/styles only when block is present
-- Internationalization ready with text domain `pano-block`
+- Internationalization ready with text domain `panoromic-image-block`
 
 ## Browser Requirements
 - Canvas API support required for image stitching

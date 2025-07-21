@@ -3,7 +3,7 @@ import Edit from './edit';
 import save from './save';
 import './style.css';
 
-registerBlockType( 'pano-block/panoramic', {
+registerBlockType( 'panoramic-image-block/panoramic', {
 	edit: Edit,
 	save,
 } );

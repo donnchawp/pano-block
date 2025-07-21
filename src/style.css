@@ -1,29 +1,29 @@
 /* Editor styles */
-.pano-block-editor .pano-images-grid {
+.panoramic-image-block-editor .panoramic-images-grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 1rem;
 	margin-bottom: 1rem;
 }
 
-.pano-block-editor .pano-images-grid .pano-image-item {
+.panoramic-image-block-editor .panoramic-images-grid .panoramic-image-item {
 	position: relative;
 }
 
-.pano-block-editor .pano-images-grid .pano-image-item img {
+.panoramic-image-block-editor .panoramic-images-grid .panoramic-image-item img {
 	width: 100%;
 	height: 150px;
 	object-fit: cover;
 	border-radius: 4px;
 }
 
-.pano-block-editor .pano-images-grid .pano-image-item button {
+.panoramic-image-block-editor .panoramic-images-grid .panoramic-image-item button {
 	position: absolute;
 	top: 8px;
 	right: 8px;
 }
 
-.pano-block-editor .pano-stitched-preview {
+.panoramic-image-block-editor .panoramic-stitched-preview {
 	margin-top: 1rem;
 	padding: 1rem;
 	border: 1px solid #ddd;
@@ -31,19 +31,19 @@
 	background: #f9f9f9;
 }
 
-.pano-block-editor .pano-stitched-preview h4 {
+.panoramic-image-block-editor .panoramic-stitched-preview h4 {
 	margin: 0 0 1rem;
 	font-size: 14px;
 }
 
-.pano-block-editor .pano-stitched-preview canvas {
+.panoramic-image-block-editor .panoramic-stitched-preview canvas {
 	border: 1px solid #ccc;
 	border-radius: 4px;
 }
 
 /* Frontend styles */
-.wp-block-pano-block-panoramic,
-.pano-block-container {
+.wp-block-panoramic-image-block-panoramic,
+.panoramic-image-block-container {
 
 	/* Block-level constraints */
 	width: 100%;
@@ -54,7 +54,7 @@
 	contain: layout;
 }
 
-.pano-block-thumbnail {
+.panoramic-image-block-thumbnail {
 	position: relative;
 	cursor: pointer;
 	border-radius: 8px;
@@ -66,7 +66,7 @@
 }
 
 /* Main 3-image thumbnail layout */
-.pano-images-container {
+.panoramic-images-container {
 	display: flex;
 	width: 100%;
 	height: auto;
@@ -74,7 +74,7 @@
 	font-size: 0;
 }
 
-.pano-image-segment {
+.panoramic-image-segment {
 	flex: 1;
 	margin: 0;
 	padding: 0;
@@ -83,7 +83,7 @@
 	line-height: 0;
 }
 
-.pano-segment-image {
+.panoramic-segment-image {
 	width: 100%;
 	height: auto;
 	display: block;
@@ -95,19 +95,19 @@
 	object-fit: cover;
 }
 
-.pano-block-thumbnail:hover,
-.pano-block-thumbnail:focus {
+.panoramic-image-block-thumbnail:hover,
+.panoramic-image-block-thumbnail:focus {
 	transform: translateY(-2px);
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 	outline: none;
 }
 
-.pano-block-thumbnail:focus {
+.panoramic-image-block-thumbnail:focus {
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 
-.pano-block-thumbnail .pano-play-overlay {
+.panoramic-image-block-thumbnail .panoramic-play-overlay {
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -123,19 +123,19 @@
 	transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.pano-block-thumbnail .pano-play-overlay .pano-play-icon {
+.panoramic-image-block-thumbnail .panoramic-play-overlay .panoramic-play-icon {
 	color: #fff;
 	font-size: 2rem;
 	line-height: 1;
 }
 
-.pano-block-thumbnail:hover .pano-play-overlay {
+.panoramic-image-block-thumbnail:hover .panoramic-play-overlay {
 	opacity: 1;
 	transform: translate(-50%, -50%) scale(1.1);
 }
 
 /* Modal viewer */
-.pano-modal {
+.panoramic-modal {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -151,19 +151,19 @@
 	transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.pano-modal.active {
+.panoramic-modal.active {
 	opacity: 1;
 	visibility: visible;
 }
 
-.pano-modal .pano-viewer-container {
+.panoramic-modal .panoramic-viewer-container {
 	position: relative;
 	width: 95%;
 	height: 90%;
 	max-width: none;
 }
 
-.pano-modal .pano-viewer-container .pano-viewer {
+.panoramic-modal .panoramic-viewer-container .panoramic-viewer {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
@@ -173,17 +173,17 @@
 	background: #000;
 }
 
-.pano-modal .pano-viewer-container .pano-viewer.dragging {
+.panoramic-modal .panoramic-viewer-container .panoramic-viewer.dragging {
 	cursor: grabbing;
 }
 
-.pano-modal .pano-viewer-container .pano-viewer canvas {
+.panoramic-modal .panoramic-viewer-container .panoramic-viewer canvas {
 	display: block;
 	max-width: none;
 	max-height: none;
 }
 
-.pano-modal .pano-viewer-container .pano-controls {
+.panoramic-modal .panoramic-viewer-container .panoramic-controls {
 	position: absolute;
 	bottom: -50px;
 	left: 50%;
@@ -192,7 +192,7 @@
 	gap: 0.5rem;
 }
 
-.pano-modal .pano-viewer-container .pano-controls button {
+.panoramic-modal .panoramic-viewer-container .panoramic-controls button {
 	background: rgba(255, 255, 255, 0.9);
 	color: #333;
 	border: none;
@@ -204,16 +204,16 @@
 	min-width: 40px;
 }
 
-.pano-modal .pano-viewer-container .pano-controls button:hover {
+.panoramic-modal .panoramic-viewer-container .panoramic-controls button:hover {
 	background: rgba(255, 255, 255, 1);
 }
 
-.pano-modal .pano-viewer-container .pano-controls button:focus {
+.panoramic-modal .panoramic-viewer-container .panoramic-controls button:focus {
 	outline: 2px solid #007cba;
 	outline-offset: 2px;
 }
 
-.pano-modal .pano-viewer-container .pano-close {
+.panoramic-modal .panoramic-viewer-container .panoramic-close {
 	position: absolute;
 	top: -50px;
 	right: 0;
@@ -229,11 +229,11 @@
 	transition: background 0.3s ease;
 }
 
-.pano-modal .pano-viewer-container .pano-close:hover {
+.panoramic-modal .panoramic-viewer-container .panoramic-close:hover {
 	background: rgba(255, 255, 255, 1);
 }
 
-.pano-modal .pano-viewer-container .pano-close:focus {
+.panoramic-modal .panoramic-viewer-container .panoramic-close:focus {
 	outline: 2px solid #007cba;
 	outline-offset: 2px;
 }
@@ -241,35 +241,35 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
 
-	.pano-modal .pano-viewer-container {
+	.panoramic-modal .panoramic-viewer-container {
 		width: 95%;
 		height: 70%;
 	}
 
-	.pano-modal .pano-viewer-container .pano-controls {
+	.panoramic-modal .panoramic-viewer-container .panoramic-controls {
 		bottom: -80px;
 		flex-wrap: wrap;
 		justify-content: center;
 	}
 
-	.pano-modal .pano-viewer-container .pano-controls button {
+	.panoramic-modal .panoramic-viewer-container .panoramic-controls button {
 		padding: 10px 16px;
 		font-size: 16px;
 	}
 
-	.pano-modal .pano-viewer-container .pano-close {
+	.panoramic-modal .panoramic-viewer-container .panoramic-close {
 		top: -60px;
 		width: 50px;
 		height: 50px;
 		font-size: 24px;
 	}
 
-	.pano-block-container .pano-block-thumbnail .pano-play-overlay {
+	.panoramic-image-block-container .panoramic-image-block-thumbnail .panoramic-play-overlay {
 		width: 60px;
 		height: 60px;
 	}
 
-	.pano-block-container .pano-block-thumbnail .pano-play-overlay .pano-play-icon {
+	.panoramic-image-block-container .panoramic-image-block-thumbnail .panoramic-play-overlay .panoramic-play-icon {
 		font-size: 1.5rem;
 	}
 }

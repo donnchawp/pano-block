@@ -18,12 +18,12 @@ A WordPress Gutenberg block that creates panoramic images from 3 stitched images
 1. Download or clone this repository to your WordPress plugins directory:
    ```bash
    cd wp-content/plugins/
-   git clone [repository-url] pano-block
+   git clone [repository-url] panoramic-image-block
    ```
 
 2. Install dependencies:
    ```bash
-   cd pano-block
+   cd panoramic-image-block
    npm install
    ```
 
@@ -90,19 +90,19 @@ npm run format
 ### File Structure
 
 ```
-pano-block/
-├── pano-block.php          # Main plugin file
-├── block.json              # Block configuration
-├── package.json            # Dependencies and scripts
-├── webpack.config.js       # Build configuration
-├── src/                    # Source files
-│   ├── index.js           # Block registration
-│   ├── edit.js            # Editor component
-│   ├── save.js            # Save component
-│   └── style.scss         # Styles
-├── assets/                 # Frontend assets
-│   └── panoramic-viewer.js # Viewer functionality
-└── build/                  # Compiled files (generated)
+panoramic-image-block/
+├── panoramic-image-block.php # Main plugin file
+├── block.json                # Block configuration
+├── package.json              # Dependencies and scripts
+├── webpack.config.js         # Build configuration
+├── src/                      # Source files
+│   ├── index.js              # Block registration
+│   ├── edit.js               # Editor component
+│   ├── save.js               # Save component
+│   └── style.scss            # Styles
+├── assets/                   # Frontend assets
+│   └── panoramic-viewer.js   # Viewer functionality
+└── build/                    # Compiled files (generated)
     ├── index.js
     ├── index.css
     └── style-index.css
