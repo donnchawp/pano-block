@@ -144,7 +144,7 @@ class Pano_Block {
 				aria-label="<?php echo esc_attr( $alt_text ? $alt_text : __( 'Open panoramic image viewer', 'pano-block' ) ); ?>">
 				
 				<!-- 3 images side by side as the main thumbnail -->
-				<div class="pano-images-container">
+				<div style='display: flex; flex-direction: row; gap: 2px;' class="pano-images-container">
 					<?php foreach ( $images as $index => $image ) : ?>
 						<?php 
 						// Create custom alt text with segment number
@@ -161,7 +161,7 @@ class Pano_Block {
 						// Only render if we have a valid attachment ID
 						if ( $attachment_id ) :
 							?>
-							<div class="pano-image-segment" data-index="<?php echo esc_attr( $index ); ?>">
+							<div style="max-width:100%;height:auto;" class="pano-image-segment" data-index="<?php echo esc_attr( $index ); ?>">
 								<?php
 								echo wp_get_attachment_image(
 									$attachment_id,
