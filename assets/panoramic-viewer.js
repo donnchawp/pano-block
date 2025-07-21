@@ -108,22 +108,25 @@ class PanoramicViewer {
 	}
 
 	bindEvents() {
-		document.addEventListener( 'DOMContentLoaded', () => {
-			const thumbnails = document.querySelectorAll(
-				'.pano-block-thumbnail'
-			);
-			thumbnails.forEach( ( thumbnail ) => {
-				thumbnail.addEventListener( 'click', ( e ) =>
-					this.openViewer( e.currentTarget )
+		const attach = () => {
+			const thumbnails = document.querySelectorAll('.pano-block-thumbnail');
+			thumbnails.forEach((thumbnail) => {
+				thumbnail.addEventListener('click', (e) =>
+					this.openViewer(e.currentTarget)
 				);
-				thumbnail.addEventListener( 'keydown', ( e ) => {
-					if ( e.key === 'Enter' || e.key === ' ' ) {
+				thumbnail.addEventListener('keydown', (e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
 						e.preventDefault();
-						this.openViewer( e.currentTarget );
+						this.openViewer(e.currentTarget);
 					}
-				} );
-			} );
-		} );
+				});
+			});
+		};
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', attach);
+		} else {
+			attach();
+		}
 	}
 
 	async openViewer( thumbnail ) {
@@ -505,5 +508,19 @@ if (!document.getElementById('pano-sr-only-style')) {
     document.head.appendChild(srOnlyStyle);
 }
 
-// Initialize viewer
-new PanoramicViewer();
+// Export PanoramicViewer for explicit initialization
+window.PanoramicViewer = PanoramicViewer;
+
+// Optionally, provide a global function to initialize the viewer if needed
+window.initPanoramicViewer = function() {
+    if (!window._panoViewerInstance) {
+        window._panoViewerInstance = new PanoramicViewer();
+    }
+    return window._panoViewerInstance;
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (!window._panoViewerInstance) {
+        window._panoViewerInstance = window.initPanoramicViewer();
+    }
+});
