@@ -13,6 +13,7 @@ class PanoramicViewer {
 		this.maxScale = 3;
 		this.panX = 0;
 		this.panY = 0;
+		this._renderScheduled = false;
 
 		// Bind handler methods
 		this.handleCloseClick = this.close.bind(this);
@@ -247,7 +248,7 @@ class PanoramicViewer {
 		this.panX = 0;
 		this.panY = 0;
 
-		this.render();
+		this.scheduleRender();
 	}
 
 	render() {
@@ -276,6 +277,16 @@ class PanoramicViewer {
 		);
 	}
 
+	scheduleRender() {
+		if (!this._renderScheduled) {
+			this._renderScheduled = true;
+			requestAnimationFrame(() => {
+				this._renderScheduled = false;
+				this.render();
+			});
+		}
+	}
+
 	// Shared pan logic
 	startPan(x, y) {
 		this.isDragging = true;
@@ -288,7 +299,7 @@ class PanoramicViewer {
 		this.panX = x - this.startX;
 		this.panY = y - this.startY;
 		this.constrainPan();
-		this.render();
+		this.scheduleRender();
 	}
 	endPan() {
 		this.isDragging = false;
@@ -334,7 +345,7 @@ class PanoramicViewer {
 		if ( newScale !== this.scale ) {
 			this.scale = newScale;
 			this.constrainPan();
-			this.render();
+			this.scheduleRender();
 		}
 	}
 
@@ -363,25 +374,25 @@ class PanoramicViewer {
 				e.preventDefault();
 				this.panX += step;
 				this.constrainPan();
-				this.render();
+				this.scheduleRender();
 				break;
 			case 'ArrowRight':
 				e.preventDefault();
 				this.panX -= step;
 				this.constrainPan();
-				this.render();
+				this.scheduleRender();
 				break;
 			case 'ArrowUp':
 				e.preventDefault();
 				this.panY += step;
 				this.constrainPan();
-				this.render();
+				this.scheduleRender();
 				break;
 			case 'ArrowDown':
 				e.preventDefault();
 				this.panY -= step;
 				this.constrainPan();
-				this.render();
+				this.scheduleRender();
 				break;
 			case '+':
 			case '=':
