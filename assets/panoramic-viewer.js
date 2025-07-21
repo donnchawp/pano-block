@@ -14,6 +14,27 @@ class PanoramicViewer {
 		this.panX = 0;
 		this.panY = 0;
 
+		// Bind handler methods
+		this.handleCloseClick = this.close.bind(this);
+		this.handleZoomInClick = () => this.zoom(1.2);
+		this.handleZoomOutClick = () => this.zoom(0.8);
+		this.handleZoomResetClick = () => this.resetView();
+		this.handleViewerMousedown = (e) => this.startDrag(e);
+		this.handleViewerMousemove = (e) => this.drag(e);
+		this.handleViewerMouseup = () => this.endDrag();
+		this.handleViewerMouseleave = () => this.endDrag();
+		this.handleViewerWheel = (e) => this.handleWheel(e);
+		this.handleViewerTouchstart = (e) => this.startTouch(e);
+		this.handleViewerTouchmove = (e) => this.dragTouch(e);
+		this.handleViewerTouchend = () => this.endDrag();
+		this.handleViewerKeydown = (e) => this.handleKeydown(e);
+		this.handleModalKeydown = this.handleModalKeydown.bind(this);
+		this.handleModalClick = (e) => {
+			if (e.target === this.modal) {
+				this.close();
+			}
+		};
+
 		this.init();
 	}
 
@@ -60,43 +81,28 @@ class PanoramicViewer {
 		this.titleEl = this.modal.querySelector( '#pano-viewer-title' );
 
 		// Bind modal events
-		this.closeBtn.addEventListener( 'click', () => this.close() );
-		this.zoomInBtn.addEventListener( 'click', () => this.zoom( 1.2 ) );
-		this.zoomOutBtn.addEventListener( 'click', () => this.zoom( 0.8 ) );
-		this.zoomResetBtn.addEventListener( 'click', () => this.resetView() );
+		this.closeBtn.addEventListener('click', this.handleCloseClick);
+		this.zoomInBtn.addEventListener('click', this.handleZoomInClick);
+		this.zoomOutBtn.addEventListener('click', this.handleZoomOutClick);
+		this.zoomResetBtn.addEventListener('click', this.handleZoomResetClick);
 
 		// Mouse events
-		this.viewer.addEventListener( 'mousedown', ( e ) =>
-			this.startDrag( e )
-		);
-		this.viewer.addEventListener( 'mousemove', ( e ) => this.drag( e ) );
-		this.viewer.addEventListener( 'mouseup', () => this.endDrag() );
-		this.viewer.addEventListener( 'mouseleave', () => this.endDrag() );
-		this.viewer.addEventListener( 'wheel', ( e ) => this.handleWheel( e ) );
+		this.viewer.addEventListener('mousedown', this.handleViewerMousedown);
+		this.viewer.addEventListener('mousemove', this.handleViewerMousemove);
+		this.viewer.addEventListener('mouseup', this.handleViewerMouseup);
+		this.viewer.addEventListener('mouseleave', this.handleViewerMouseleave);
+		this.viewer.addEventListener('wheel', this.handleViewerWheel);
 
 		// Touch events
-		this.viewer.addEventListener( 'touchstart', ( e ) =>
-			this.startTouch( e )
-		);
-		this.viewer.addEventListener( 'touchmove', ( e ) =>
-			this.dragTouch( e )
-		);
-		this.viewer.addEventListener( 'touchend', () => this.endDrag() );
+		this.viewer.addEventListener('touchstart', this.handleViewerTouchstart);
+		this.viewer.addEventListener('touchmove', this.handleViewerTouchmove);
+		this.viewer.addEventListener('touchend', this.handleViewerTouchend);
 
 		// Keyboard events
-		this.viewer.addEventListener( 'keydown', ( e ) =>
-			this.handleKeydown( e )
-		);
-		this.modal.addEventListener( 'keydown', ( e ) =>
-			this.handleModalKeydown( e )
-		);
+		this.viewer.addEventListener('keydown', this.handleViewerKeydown);
 
 		// Click outside to close
-		this.modal.addEventListener( 'click', ( e ) => {
-			if ( e.target === this.modal ) {
-				this.close();
-			}
-		} );
+		this.modal.addEventListener('click', this.handleModalClick);
 	}
 
 	bindEvents() {
@@ -139,16 +145,25 @@ class PanoramicViewer {
 		// Trap focus in modal
 		this.trapFocus();
 
+		// Add Escape key handler to document
+		document.addEventListener('keydown', this.handleModalKeydown);
+
 		// Prevent body scroll
 		document.body.style.overflow = 'hidden';
 	}
 
 	close() {
-		this.modal.classList.remove( 'active' );
+		this.modal.classList.remove('active');
 		document.body.style.overflow = '';
 
+		// Remove Escape key handler from document
+		document.removeEventListener('keydown', this.handleModalKeydown);
+
+		// Only remove event listeners if destroying the modal, not on close
+		// (Keep modal event listeners attached for modal lifetime)
+
 		// Restore focus
-		if ( this.previousFocus ) {
+		if (this.previousFocus) {
 			this.previousFocus.focus();
 		}
 	}
