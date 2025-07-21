@@ -8,11 +8,11 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Create stunning panoramic images from 3 photos with an interactive viewer for drag, zoom, and keyboard navigation.
+Display your panoramic images from 3 photos with an interactive viewer for drag, zoom, and keyboard navigation.
 
 == Description ==
 
-**Panoramic Image Block** is a powerful WordPress Gutenberg block that allows you to create beautiful panoramic images by automatically stitching together 3 uploaded images. Perfect for showcasing landscapes, architecture, events, or any wide-angle view.
+**Panoramic Image Block** is a powerful WordPress Gutenberg block that allows you to display beautiful panoramic images by automatically stitching together 3 uploaded images. Perfect for showcasing landscapes, architecture, events, or any wide-angle view.
 
 ### Key Features
 
@@ -41,15 +41,6 @@ Create stunning panoramic images from 3 photos with an interactive viewer for dr
 * **Architecture** - Present building designs and spaces
 * **Events** - Capture wide venue shots and group photos
 * **Art & Photography** - Create immersive visual experiences
-
-### Technical Details
-
-* Uses HTML5 Canvas for image processing
-* Mobile-friendly touch gestures
-* Keyboard shortcuts: Arrow keys (pan), +/- (zoom), 0 (reset), Esc (close)
-* Follows WordPress coding standards
-* Translation ready with text domain support
-* Clean, semantic HTML output
 
 The plugin requires no configuration - simply install, activate, and start creating panoramic content!
 
@@ -91,11 +82,18 @@ Exactly 3 images are required to create a panoramic view. The plugin will automa
 
 = What's the recommended image size? =
 
-For best results, use images with similar heights and overlapping content at the edges. Images between 800-2000 pixels wide work well.
+For best results, use images that have been split into 3 event parts. Images between 800-2000 pixels wide work well.
 
 = Can I use images of different sizes? =
 
 Yes! The plugin automatically handles images of different dimensions by aligning them vertically and scaling appropriately.
+
+= How do I split a panorama into 3 parts? =
+
+Use ImageMagick like this:
+```
+magick input.jpg -crop 33.33%x100% "output_split_%d.jpg"
+```
 
 = Does it work on mobile devices? =
 
@@ -120,14 +118,6 @@ The plugin is designed for the WordPress block editor (Gutenberg). Compatibility
 = Is translation support available? =
 
 Yes, the plugin is translation-ready with proper text domain implementation for all user-facing strings.
-
-== Screenshots ==
-
-1. **Block Editor Interface** - Easy 3-image selection with live stitching preview
-2. **Frontend Thumbnail** - Responsive thumbnail with play overlay that fits your content width  
-3. **Panoramic Viewer** - Full-screen interactive viewer with pan and zoom controls
-4. **Mobile Experience** - Touch-friendly navigation on mobile devices
-5. **Block Settings** - Simple settings panel for alt text and accessibility
 
 == Changelog ==
 
