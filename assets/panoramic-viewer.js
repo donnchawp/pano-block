@@ -274,47 +274,45 @@ class PanoramicViewer {
 		);
 	}
 
-	startDrag( e ) {
+	// Shared pan logic
+	startPan(x, y) {
 		this.isDragging = true;
-		this.startX = e.clientX - this.panX;
-		this.startY = e.clientY - this.panY;
-		this.viewer.classList.add( 'dragging' );
+		this.startX = x - this.panX;
+		this.startY = y - this.panY;
+		this.viewer.classList.add('dragging');
 	}
-
-	drag( e ) {
-		if ( ! this.isDragging ) return;
-
-		this.panX = e.clientX - this.startX;
-		this.panY = e.clientY - this.startY;
-
+	dragPan(x, y) {
+		if (!this.isDragging) return;
+		this.panX = x - this.startX;
+		this.panY = y - this.startY;
 		this.constrainPan();
 		this.render();
 	}
-
-	endDrag() {
+	endPan() {
 		this.isDragging = false;
-		this.viewer.classList.remove( 'dragging' );
+		this.viewer.classList.remove('dragging');
 	}
 
-	startTouch( e ) {
-		if ( e.touches.length === 1 ) {
-			const touch = e.touches[ 0 ];
-			this.isDragging = true;
-			this.startX = touch.clientX - this.panX;
-			this.startY = touch.clientY - this.panY;
+	startDrag(e) {
+		this.startPan(e.clientX, e.clientY);
+	}
+	drag(e) {
+		this.dragPan(e.clientX, e.clientY);
+	}
+	endDrag() {
+		this.endPan();
+	}
+	startTouch(e) {
+		if (e.touches.length === 1) {
+			const touch = e.touches[0];
+			this.startPan(touch.clientX, touch.clientY);
 		}
 		e.preventDefault();
 	}
-
-	dragTouch( e ) {
-		if ( ! this.isDragging || e.touches.length !== 1 ) return;
-
-		const touch = e.touches[ 0 ];
-		this.panX = touch.clientX - this.startX;
-		this.panY = touch.clientY - this.startY;
-
-		this.constrainPan();
-		this.render();
+	dragTouch(e) {
+		if (!this.isDragging || e.touches.length !== 1) return;
+		const touch = e.touches[0];
+		this.dragPan(touch.clientX, touch.clientY);
 		e.preventDefault();
 	}
 
