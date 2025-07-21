@@ -144,7 +144,7 @@ class Pano_Block {
 				aria-label="<?php echo esc_attr( $alt_text ? $alt_text : __( 'Open panoramic image viewer', 'pano-block' ) ); ?>">
 				
 				<!-- 3 images side by side as the main thumbnail -->
-				<div style='display: flex; flex-direction: row; gap: 2px;' class="pano-images-container">
+				<div style='display: flex; flex-direction: row; gap: 0px;' class="pano-images-container">
 					<?php foreach ( $images as $index => $image ) : ?>
 						<?php 
 						// Create custom alt text with segment number
