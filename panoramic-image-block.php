@@ -71,8 +71,8 @@ class Panoramic_Image_Block {
 	 * @since 1.0.0
 	 */
 	private function init_hooks() {
-		add_action( 'init', array( $this, 'panoramic_image_block_register_block' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'panoramic_image_block_enqueue_frontend_scripts' ) );
+		add_action( 'init', array( $this, 'register_blocks' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_scripts' ) );
 	}
 
 	/**
@@ -80,7 +80,7 @@ class Panoramic_Image_Block {
 	 *
 	 * @since 1.0.0
 	 */
-	public function panoramic_image_block_register_block() {
+	public function register_blocks() {
 		if ( ! function_exists( 'register_block_type' ) ) {
 			return;
 		}
@@ -89,7 +89,7 @@ class Panoramic_Image_Block {
 		register_block_type(
 			PANORAMIC_IMAGE_BLOCK_PLUGIN_DIR . 'block.json',
 			array(
-				'render_callback' => array( $this, 'panoramic_image_block_render_block' ),
+				'render_callback' => array( $this, 'render_panoramic_block' ),
 			)
 		);
 
@@ -97,7 +97,7 @@ class Panoramic_Image_Block {
 		register_block_type(
 			PANORAMIC_IMAGE_BLOCK_PLUGIN_DIR . 'single-panoramic-block.json',
 			array(
-				'render_callback' => array( $this, 'single_panoramic_image_block_render_block' ),
+				'render_callback' => array( $this, 'render_single_panoramic_block' ),
 			)
 		);
 	}
@@ -147,7 +147,7 @@ class Panoramic_Image_Block {
 	}
 
 	/**
-	 * Render the block on the frontend.
+	 * Render the panoramic block on the frontend.
 	 *
 	 * @since 1.0.0
 	 * @param array  $attributes Block attributes.
@@ -155,7 +155,7 @@ class Panoramic_Image_Block {
 	 * @param object $block      Block object.
 	 * @return string Rendered block HTML.
 	 */
-	public function panoramic_image_block_render_block( $attributes, $content, $block ) {
+	public function render_panoramic_block( $attributes, $content, $block ) {
 		if ( empty( $attributes['images'] ) || ! is_array( $attributes['images'] ) || count( $attributes['images'] ) !== 3 ) {
 			return '<p>' . esc_html__( 'Please select 3 images to create a panoramic view.', 'panoramic-image-block' ) . '</p>';
 		}
@@ -241,7 +241,7 @@ class Panoramic_Image_Block {
 	 * @param array $images Array of image URLs.
 	 * @return string SVG data URL.
 	 */
-	private function panoramic_image_block_generate_stitched_image_data( $images ) {
+	private function generate_stitched_image_data( $images ) {
 		// Return a data attribute that JavaScript will use to stitch the images.
 		// This way we avoid server-side image processing and let the browser handle it.
 		$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" viewBox="0 0 800 200">
@@ -296,7 +296,7 @@ class Panoramic_Image_Block {
 	 * @param object $block      Block object.
 	 * @return string Rendered block HTML.
 	 */
-	public function single_panoramic_image_block_render_block( $attributes, $content, $block ) {
+	public function render_single_panoramic_block( $attributes, $content, $block ) {
 		if ( empty( $attributes['image'] ) || ! is_array( $attributes['image'] ) || empty( $attributes['image']['url'] ) ) {
 			return '<p>' . esc_html__( 'Please select a panoramic image.', 'panoramic-image-block' ) . '</p>';
 		}
@@ -375,7 +375,7 @@ class Panoramic_Image_Block {
 	 *
 	 * @since 1.0.0
 	 */
-	public function panoramic_image_block_enqueue_frontend_scripts() {
+	public function enqueue_frontend_scripts() {
 		if ( ! has_block( 'panoramic-image-block/panoramic' ) && ! has_block( 'panoramic-image-block/single-panoramic' ) ) {
 			return;
 		}
@@ -403,8 +403,50 @@ class Panoramic_Image_Block {
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'panoramic_image_block_nonce' ),
 				'strings' => array(
-					'loading' => __( 'Loading panoramic view...', 'panoramic-image-block' ),
-					'error'   => __( 'Error loading panoramic view.', 'panoramic-image-block' ),
+					// Loading states
+					'loading'           => __( 'Loading panoramic view...', 'panoramic-image-block' ),
+					'loadingView'       => __( 'Loading panoramic view...', 'panoramic-image-block' ),
+					'loadingImage'      => __( 'Loading panoramic image', 'panoramic-image-block' ),
+					'error'             => __( 'Error loading panoramic view.', 'panoramic-image-block' ),
+					
+					// Viewer interface
+					'viewerTitle'       => __( 'Panoramic Image Viewer', 'panoramic-image-block' ),
+					'closeViewer'       => __( 'Close panoramic viewer', 'panoramic-image-block' ),
+					'closeEsc'          => __( 'Close (Esc)', 'panoramic-image-block' ),
+					'interactiveViewer' => __( 'Interactive panoramic image viewer', 'panoramic-image-block' ),
+					'viewerControls'    => __( 'Panoramic viewer controls', 'panoramic-image-block' ),
+					
+					// Controls
+					'zoomIn'            => __( 'Zoom in', 'panoramic-image-block' ),
+					'zoomOut'           => __( 'Zoom out', 'panoramic-image-block' ),
+					'zoomInKey'         => __( 'Zoom in (+)', 'panoramic-image-block' ),
+					'zoomOutKey'        => __( 'Zoom out (-)', 'panoramic-image-block' ),
+					'reset'             => __( 'Reset', 'panoramic-image-block' ),
+					'resetZoom'         => __( 'Reset zoom and position', 'panoramic-image-block' ),
+					'resetKey'          => __( 'Reset zoom (0)', 'panoramic-image-block' ),
+					
+					// Instructions and help
+					'instructions'      => __( 'Interactive panoramic image viewer. Use arrow keys or drag to pan the image. Use + and - keys or controls to zoom. Press 0 to reset view. Press Escape to close.', 'panoramic-image-block' ),
+					'controlsHelp'      => __( 'Zoom controls available. Current zoom level and position will be announced when changed.', 'panoramic-image-block' ),
+					'zoomHelp'          => __( 'Zoom in or out of the panoramic image', 'panoramic-image-block' ),
+					'resetHelp'         => __( 'Reset zoom level to fit view and center the image', 'panoramic-image-block' ),
+					
+					// Error messages
+					'retryFailed'       => __( 'Retry failed. Please refresh the page and try again.', 'panoramic-image-block' ),
+					'tryAgain'          => __( 'Try Again', 'panoramic-image-block' ),
+					'loadingError'      => __( 'Loading Error', 'panoramic-image-block' ),
+					
+					// Progressive loading
+					'loadingPreview'    => __( 'Loading preview...', 'panoramic-image-block' ),
+					'loadingHighRes'    => __( 'Loading high resolution...', 'panoramic-image-block' ),
+					'thumbnailsLoaded'  => _n_noop( '%d thumbnail loaded', '%d thumbnails loaded', 'panoramic-image-block' ),
+					'imagesLoaded'      => _n_noop( '%d image loaded', '%d images loaded', 'panoramic-image-block' ),
+					
+					// Accessibility announcements
+					'imageLoaded'       => __( 'Panoramic image loaded successfully', 'panoramic-image-block' ),
+					'zoomedIn'          => __( 'Zoomed in to %d%%', 'panoramic-image-block' ),
+					'zoomedOut'         => __( 'Zoomed out to %d%%', 'panoramic-image-block' ),
+					'viewReset'         => __( 'View reset. Zoom: %d%%, centered', 'panoramic-image-block' ),
 				),
 			)
 		);
@@ -417,8 +459,12 @@ class Panoramic_Image_Block {
  * @since 1.0.0
  */
 function panoramic_image_block_activate() {
-	// Add activation logic here if needed.
-	flush_rewrite_rules();
+	// Activation logic - no rewrite rules needed for blocks
+	// Register blocks to ensure they're available
+	if ( class_exists( 'Panoramic_Image_Block' ) ) {
+		$instance = Panoramic_Image_Block::get_instance();
+		$instance->register_blocks();
+	}
 }
 register_activation_hook( __FILE__, 'panoramic_image_block_activate' );
 
@@ -428,8 +474,8 @@ register_activation_hook( __FILE__, 'panoramic_image_block_activate' );
  * @since 1.0.0
  */
 function panoramic_image_block_deactivate() {
-	// Add deactivation logic here if needed.
-	flush_rewrite_rules();
+	// Deactivation logic - no cleanup needed for blocks
+	// Blocks will automatically be unavailable after deactivation
 }
 register_deactivation_hook( __FILE__, 'panoramic_image_block_deactivate' );
 
@@ -439,8 +485,23 @@ register_deactivation_hook( __FILE__, 'panoramic_image_block_deactivate' );
  * @since 1.0.0
  */
 function panoramic_image_block_uninstall() {
-	// Add uninstall logic here if needed.
-	// This function is called when the plugin is deleted.
+	// Clean up any plugin-specific data
+	// Note: This plugin doesn't create custom tables or options
+	// But we'll clear any cached data that might exist
+	
+	// Clear any transients we might have set
+	delete_transient( 'panoramic_image_block_version_check' );
+	
+	// Clear any user meta if we stored any
+	delete_metadata( 'user', 0, 'panoramic_image_block_preferences', '', true );
+	
+	// Clear any option cleanup (none currently used, but good practice)
+	delete_option( 'panoramic_image_block_settings' );
+	
+	// Force clear any caches
+	if ( function_exists( 'wp_cache_flush' ) ) {
+		wp_cache_flush();
+	}
 }
 register_uninstall_hook( __FILE__, 'panoramic_image_block_uninstall' );
 
