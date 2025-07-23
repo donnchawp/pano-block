@@ -103,6 +103,50 @@ class Panoramic_Image_Block {
 	}
 
 	/**
+	 * Sanitize images data for security.
+	 *
+	 * @since 1.0.0
+	 * @param array $images Array of image data.
+	 * @return array Sanitized images data.
+	 */
+	private function sanitize_images_data( $images ) {
+		if ( ! is_array( $images ) ) {
+			return array();
+		}
+
+		$sanitized = array();
+		foreach ( $images as $image ) {
+			if ( ! is_array( $image ) ) {
+				continue;
+			}
+
+			$sanitized_image = array();
+			
+			// Sanitize ID
+			if ( isset( $image['id'] ) ) {
+				$sanitized_image['id'] = absint( $image['id'] );
+			}
+			
+			// Sanitize URL
+			if ( isset( $image['url'] ) ) {
+				$sanitized_image['url'] = esc_url_raw( $image['url'] );
+			}
+			
+			// Sanitize alt text
+			if ( isset( $image['alt'] ) ) {
+				$sanitized_image['alt'] = sanitize_text_field( $image['alt'] );
+			}
+
+			// Only include if we have at least a URL
+			if ( ! empty( $sanitized_image['url'] ) ) {
+				$sanitized[] = $sanitized_image;
+			}
+		}
+
+		return $sanitized;
+	}
+
+	/**
 	 * Render the block on the frontend.
 	 *
 	 * @since 1.0.0
@@ -116,8 +160,13 @@ class Panoramic_Image_Block {
 			return '<p>' . esc_html__( 'Please select 3 images to create a panoramic view.', 'panoramic-image-block' ) . '</p>';
 		}
 
-		$images = $attributes['images'];
+		$images = $this->sanitize_images_data( $attributes['images'] );
 		$alt_text = sanitize_text_field( $attributes['altText'] ?? '' );
+
+		// Additional validation after sanitization
+		if ( count( $images ) !== 3 ) {
+			return '<p>' . esc_html__( 'Please select 3 valid images to create a panoramic view.', 'panoramic-image-block' ) . '</p>';
+		}
 		$block_id = 'panoramic-image-block-' . wp_generate_uuid4();
 
 		// Get the block wrapper attributes to ensure proper width constraints.
@@ -142,8 +191,8 @@ class Panoramic_Image_Block {
 				<div style='display: flex; flex-direction: row; gap: 0px;' class="panoramic-images-container">
 					<?php foreach ( $images as $index => $image ) : ?>
 						<?php
-						// Create custom alt text with segment number
-						$segment_alt = $alt_text ? $alt_text . ' (' . ( $index + 1 ) . '/3)' : '';
+						// Create custom alt text with segment number - properly sanitized
+						$segment_alt = $alt_text ? esc_attr( $alt_text . ' (' . ( $index + 1 ) . '/3)' ) : '';
 
 						// Determine attachment ID - check direct ID first, then try to find from URL
 						$attachment_id = 0;
@@ -164,7 +213,7 @@ class Panoramic_Image_Block {
 									false,
 									array(
 										'class' => 'panoramic-segment-image',
-										'alt'   => $segment_alt,
+										'alt'   => $segment_alt, // Already escaped above
 									)
 								);
 								?>
@@ -207,6 +256,38 @@ class Panoramic_Image_Block {
 	}
 
 	/**
+	 * Sanitize single image data for security.
+	 *
+	 * @since 1.0.0
+	 * @param array $image Single image data.
+	 * @return array Sanitized image data.
+	 */
+	private function sanitize_single_image_data( $image ) {
+		if ( ! is_array( $image ) ) {
+			return array();
+		}
+
+		$sanitized_image = array();
+		
+		// Sanitize ID
+		if ( isset( $image['id'] ) ) {
+			$sanitized_image['id'] = absint( $image['id'] );
+		}
+		
+		// Sanitize URL
+		if ( isset( $image['url'] ) ) {
+			$sanitized_image['url'] = esc_url_raw( $image['url'] );
+		}
+		
+		// Sanitize alt text
+		if ( isset( $image['alt'] ) ) {
+			$sanitized_image['alt'] = sanitize_text_field( $image['alt'] );
+		}
+
+		return $sanitized_image;
+	}
+
+	/**
 	 * Render the single panoramic block on the frontend.
 	 *
 	 * @since 1.0.0
@@ -220,8 +301,13 @@ class Panoramic_Image_Block {
 			return '<p>' . esc_html__( 'Please select a panoramic image.', 'panoramic-image-block' ) . '</p>';
 		}
 
-		$image = $attributes['image'];
+		$image = $this->sanitize_single_image_data( $attributes['image'] );
 		$alt_text = sanitize_text_field( $attributes['altText'] ?? '' );
+
+		// Additional validation after sanitization
+		if ( empty( $image['url'] ) ) {
+			return '<p>' . esc_html__( 'Please select a valid panoramic image.', 'panoramic-image-block' ) . '</p>';
+		}
 		$block_id = 'single-panoramic-image-block-' . wp_generate_uuid4();
 
 		// Get the block wrapper attributes to ensure proper width constraints.
@@ -261,7 +347,7 @@ class Panoramic_Image_Block {
 							false,
 							array(
 								'class' => 'single-panoramic-image',
-								'alt'   => $alt_text ? $alt_text : $image['alt'],
+								'alt'   => esc_attr( $alt_text ? $alt_text : $image['alt'] ),
 							)
 						);
 						?>

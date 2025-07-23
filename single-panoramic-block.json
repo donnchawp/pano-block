@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "panoramic-image-block/single-panoramic",
+	"title": "Single Panoramic Image Block",
+	"category": "media",
+	"icon": "format-image",
+	"description": "Display a single large panoramic image with interactive viewer.",
+	"keywords": [ "panorama", "panoramic", "image", "single", "360" ],
+	"version": "1.0.0",
+	"textdomain": "panoramic-image-block",
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ],
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"attributes": {
+		"image": {
+			"type": "object",
+			"default": {},
+			"properties": {
+				"id": {
+					"type": "number"
+				},
+				"url": {
+					"type": "string"
+				},
+				"alt": {
+					"type": "string"
+				}
+			}
+		},
+		"altText": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"example": {
+		"attributes": {
+			"image": {},
+			"altText": "Sample single panoramic view"
+		}
+	},
+	"editorScript": "file:./build/single-panoramic.js",
+	"editorStyle": "file:./build/single-panoramic.css",
+	"style": "file:./build/style-index.css"
+}
