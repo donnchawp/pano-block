@@ -121,17 +121,17 @@ class Panoramic_Image_Block {
 			}
 
 			$sanitized_image = array();
-			
+
 			// Sanitize ID
 			if ( isset( $image['id'] ) ) {
 				$sanitized_image['id'] = absint( $image['id'] );
 			}
-			
+
 			// Sanitize URL
 			if ( isset( $image['url'] ) ) {
 				$sanitized_image['url'] = esc_url_raw( $image['url'] );
 			}
-			
+
 			// Sanitize alt text
 			if ( isset( $image['alt'] ) ) {
 				$sanitized_image['alt'] = sanitize_text_field( $image['alt'] );
@@ -268,17 +268,17 @@ class Panoramic_Image_Block {
 		}
 
 		$sanitized_image = array();
-		
+
 		// Sanitize ID
 		if ( isset( $image['id'] ) ) {
 			$sanitized_image['id'] = absint( $image['id'] );
 		}
-		
+
 		// Sanitize URL
 		if ( isset( $image['url'] ) ) {
 			$sanitized_image['url'] = esc_url_raw( $image['url'] );
 		}
-		
+
 		// Sanitize alt text
 		if ( isset( $image['alt'] ) ) {
 			$sanitized_image['alt'] = sanitize_text_field( $image['alt'] );
@@ -376,7 +376,28 @@ class Panoramic_Image_Block {
 	 * @since 1.0.0
 	 */
 	public function enqueue_frontend_scripts() {
-		if ( ! has_block( 'panoramic-image-block/panoramic' ) && ! has_block( 'panoramic-image-block/single-panoramic' ) ) {
+		// Check if we need to load scripts - more comprehensive check for archive/homepage
+		$should_load = false;
+
+		// Check current post/page
+		if ( has_block( 'panoramic-image-block/panoramic' ) || has_block( 'panoramic-image-block/single-panoramic' ) ) {
+			$should_load = true;
+		}
+
+		// For archive pages, homepage, and other multi-post contexts, check all posts in the main query
+		if ( ! $should_load && ( is_home() || is_archive() || is_search() ) ) {
+			global $wp_query;
+			if ( $wp_query->posts ) {
+				foreach ( $wp_query->posts as $post ) {
+					if ( has_block( 'panoramic-image-block/panoramic', $post ) || has_block( 'panoramic-image-block/single-panoramic', $post ) ) {
+						$should_load = true;
+						break;
+					}
+				}
+			}
+		}
+
+		if ( ! $should_load ) {
 			return;
 		}
 
@@ -408,14 +429,14 @@ class Panoramic_Image_Block {
 					'loadingView'       => __( 'Loading panoramic view...', 'panoramic-image-block' ),
 					'loadingImage'      => __( 'Loading panoramic image', 'panoramic-image-block' ),
 					'error'             => __( 'Error loading panoramic view.', 'panoramic-image-block' ),
-					
+
 					// Viewer interface
 					'viewerTitle'       => __( 'Panoramic Image Viewer', 'panoramic-image-block' ),
 					'closeViewer'       => __( 'Close panoramic viewer', 'panoramic-image-block' ),
 					'closeEsc'          => __( 'Close (Esc)', 'panoramic-image-block' ),
 					'interactiveViewer' => __( 'Interactive panoramic image viewer', 'panoramic-image-block' ),
 					'viewerControls'    => __( 'Panoramic viewer controls', 'panoramic-image-block' ),
-					
+
 					// Controls
 					'zoomIn'            => __( 'Zoom in', 'panoramic-image-block' ),
 					'zoomOut'           => __( 'Zoom out', 'panoramic-image-block' ),
@@ -424,24 +445,24 @@ class Panoramic_Image_Block {
 					'reset'             => __( 'Reset', 'panoramic-image-block' ),
 					'resetZoom'         => __( 'Reset zoom and position', 'panoramic-image-block' ),
 					'resetKey'          => __( 'Reset zoom (0)', 'panoramic-image-block' ),
-					
+
 					// Instructions and help
 					'instructions'      => __( 'Interactive panoramic image viewer. Use arrow keys or drag to pan the image. Use + and - keys or controls to zoom. Press 0 to reset view. Press Escape to close.', 'panoramic-image-block' ),
 					'controlsHelp'      => __( 'Zoom controls available. Current zoom level and position will be announced when changed.', 'panoramic-image-block' ),
 					'zoomHelp'          => __( 'Zoom in or out of the panoramic image', 'panoramic-image-block' ),
 					'resetHelp'         => __( 'Reset zoom level to fit view and center the image', 'panoramic-image-block' ),
-					
+
 					// Error messages
 					'retryFailed'       => __( 'Retry failed. Please refresh the page and try again.', 'panoramic-image-block' ),
 					'tryAgain'          => __( 'Try Again', 'panoramic-image-block' ),
 					'loadingError'      => __( 'Loading Error', 'panoramic-image-block' ),
-					
+
 					// Progressive loading
 					'loadingPreview'    => __( 'Loading preview...', 'panoramic-image-block' ),
 					'loadingHighRes'    => __( 'Loading high resolution...', 'panoramic-image-block' ),
 					'thumbnailsLoaded'  => _n_noop( '%d thumbnail loaded', '%d thumbnails loaded', 'panoramic-image-block' ),
 					'imagesLoaded'      => _n_noop( '%d image loaded', '%d images loaded', 'panoramic-image-block' ),
-					
+
 					// Accessibility announcements
 					'imageLoaded'       => __( 'Panoramic image loaded successfully', 'panoramic-image-block' ),
 					'zoomedIn'          => __( 'Zoomed in to %d%%', 'panoramic-image-block' ),
@@ -488,16 +509,16 @@ function panoramic_image_block_uninstall() {
 	// Clean up any plugin-specific data
 	// Note: This plugin doesn't create custom tables or options
 	// But we'll clear any cached data that might exist
-	
+
 	// Clear any transients we might have set
 	delete_transient( 'panoramic_image_block_version_check' );
-	
+
 	// Clear any user meta if we stored any
 	delete_metadata( 'user', 0, 'panoramic_image_block_preferences', '', true );
-	
+
 	// Clear any option cleanup (none currently used, but good practice)
 	delete_option( 'panoramic_image_block_settings' );
-	
+
 	// Force clear any caches
 	if ( function_exists( 'wp_cache_flush' ) ) {
 		wp_cache_flush();
