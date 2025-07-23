@@ -76,7 +76,7 @@ class Panoramic_Image_Block {
 	}
 
 	/**
-	 * Register the block.
+	 * Register the blocks.
 	 *
 	 * @since 1.0.0
 	 */
@@ -85,10 +85,19 @@ class Panoramic_Image_Block {
 			return;
 		}
 
+		// Register the original panoramic block (3 images)
 		register_block_type(
 			PANORAMIC_IMAGE_BLOCK_PLUGIN_DIR . 'block.json',
 			array(
 				'render_callback' => array( $this, 'panoramic_image_block_render_block' ),
+			)
+		);
+
+		// Register the single panoramic block (1 image)
+		register_block_type(
+			PANORAMIC_IMAGE_BLOCK_PLUGIN_DIR . 'single-panoramic-block.json',
+			array(
+				'render_callback' => array( $this, 'single_panoramic_image_block_render_block' ),
 			)
 		);
 	}
@@ -128,14 +137,14 @@ class Panoramic_Image_Block {
 				role="button"
 				tabindex="0"
 				aria-label="<?php echo esc_attr( $alt_text ? $alt_text : __( 'Open panoramic image viewer', 'panoramic-image-block' ) ); ?>">
-				
+
 				<!-- 3 images side by side as the main thumbnail -->
 				<div style='display: flex; flex-direction: row; gap: 0px;' class="panoramic-images-container">
 					<?php foreach ( $images as $index => $image ) : ?>
-						<?php 
+						<?php
 						// Create custom alt text with segment number
 						$segment_alt = $alt_text ? $alt_text . ' (' . ( $index + 1 ) . '/3)' : '';
-						
+
 						// Determine attachment ID - check direct ID first, then try to find from URL
 						$attachment_id = 0;
 						if ( isset( $image['id'] ) && $image['id'] ) {
@@ -143,7 +152,7 @@ class Panoramic_Image_Block {
 						} elseif ( isset( $image['url'] ) && $image['url'] ) {
 							$attachment_id = attachment_url_to_postid( $image['url'] );
 						}
-						
+
 						// Only render if we have a valid attachment ID
 						if ( $attachment_id ) :
 							?>
@@ -165,7 +174,7 @@ class Panoramic_Image_Block {
 						?>
 					<?php endforeach; ?>
 				</div>
-				
+
 				<!-- Play overlay for JavaScript interaction -->
 				<div class="panoramic-play-overlay">
 					<span class="panoramic-play-icon" aria-hidden="true">⚬</span>
@@ -188,7 +197,7 @@ class Panoramic_Image_Block {
 		// This way we avoid server-side image processing and let the browser handle it.
 		$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" viewBox="0 0 800 200">
 			<rect width="800" height="200" fill="#f0f0f0"/>
-			<text x="400" y="100" text-anchor="middle" dominant-baseline="central" 
+			<text x="400" y="100" text-anchor="middle" dominant-baseline="central"
 				font-family="Arial, sans-serif" font-size="16" fill="#666">
 				' . esc_html__( 'Panoramic Preview (3 images stitched)', 'panoramic-image-block' ) . '
 			</text>
@@ -198,12 +207,90 @@ class Panoramic_Image_Block {
 	}
 
 	/**
+	 * Render the single panoramic block on the frontend.
+	 *
+	 * @since 1.0.0
+	 * @param array  $attributes Block attributes.
+	 * @param string $content    Block content.
+	 * @param object $block      Block object.
+	 * @return string Rendered block HTML.
+	 */
+	public function single_panoramic_image_block_render_block( $attributes, $content, $block ) {
+		if ( empty( $attributes['image'] ) || ! is_array( $attributes['image'] ) || empty( $attributes['image']['url'] ) ) {
+			return '<p>' . esc_html__( 'Please select a panoramic image.', 'panoramic-image-block' ) . '</p>';
+		}
+
+		$image = $attributes['image'];
+		$alt_text = sanitize_text_field( $attributes['altText'] ?? '' );
+		$block_id = 'single-panoramic-image-block-' . wp_generate_uuid4();
+
+		// Get the block wrapper attributes to ensure proper width constraints.
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class' => 'single-panoramic-image-block-container',
+				'id'    => $block_id,
+			)
+		);
+
+		// Determine attachment ID - check direct ID first, then try to find from URL
+		$attachment_id = 0;
+		if ( isset( $image['id'] ) && $image['id'] ) {
+			$attachment_id = $image['id'];
+		} elseif ( isset( $image['url'] ) && $image['url'] ) {
+			$attachment_id = attachment_url_to_postid( $image['url'] );
+		}
+
+		ob_start();
+		?>
+		<div <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+			<div class="single-panoramic-image-block-thumbnail"
+				data-image="<?php echo esc_attr( wp_json_encode( $image ) ); ?>"
+				data-alt="<?php echo esc_attr( $alt_text ); ?>"
+				data-block-type="single"
+				role="button"
+				tabindex="0"
+				aria-label="<?php echo esc_attr( $alt_text ? $alt_text : __( 'Open single panoramic image viewer', 'panoramic-image-block' ) ); ?>">
+
+				<!-- Single panoramic image -->
+				<div class="single-panoramic-image-container">
+					<?php if ( $attachment_id ) : ?>
+						<?php
+						echo wp_get_attachment_image(
+							$attachment_id,
+							'large',
+							false,
+							array(
+								'class' => 'single-panoramic-image',
+								'alt'   => $alt_text ? $alt_text : $image['alt'],
+							)
+						);
+						?>
+					<?php else : ?>
+						<img
+							src="<?php echo esc_url( $image['url'] ); ?>"
+							alt="<?php echo esc_attr( $alt_text ? $alt_text : $image['alt'] ); ?>"
+							class="single-panoramic-image"
+						/>
+					<?php endif; ?>
+				</div>
+
+				<!-- Play overlay for JavaScript interaction -->
+				<div class="single-panoramic-play-overlay">
+					<span class="single-panoramic-play-icon" aria-hidden="true">⚬</span>
+				</div>
+			</div>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
 	 * Enqueue frontend scripts and styles.
 	 *
 	 * @since 1.0.0
 	 */
 	public function panoramic_image_block_enqueue_frontend_scripts() {
-		if ( ! has_block( 'panoramic-image-block/panoramic' ) ) {
+		if ( ! has_block( 'panoramic-image-block/panoramic' ) && ! has_block( 'panoramic-image-block/single-panoramic' ) ) {
 			return;
 		}
 

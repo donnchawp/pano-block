@@ -6,8 +6,12 @@ class PanoramicViewer {
 		this.images = [];
 		this.stitchedCanvas = null;
 		this.isDragging = false;
+		this.isMouseDown = false;
 		this.startX = 0;
 		this.startY = 0;
+		this.initialMouseX = 0;
+		this.initialMouseY = 0;
+		this.dragThreshold = 5; // pixels to move before starting drag
 		this.scale = 1;
 		this.minScale = 0.5;
 		this.maxScale = 3;
@@ -109,7 +113,8 @@ class PanoramicViewer {
 
 	bindEvents() {
 		const attach = () => {
-			const thumbnails = document.querySelectorAll('.panoramic-image-block-thumbnail');
+			// Handle both panoramic (3 images) and single panoramic (1 image) blocks
+			const thumbnails = document.querySelectorAll('.panoramic-image-block-thumbnail, .single-panoramic-image-block-thumbnail');
 			thumbnails.forEach((thumbnail) => {
 				thumbnail.addEventListener('click', (e) =>
 					this.openViewer(e.currentTarget)
@@ -130,7 +135,7 @@ class PanoramicViewer {
 	}
 
 	async openViewer( thumbnail ) {
-		const imagesData = JSON.parse( thumbnail.dataset.images );
+		const blockType = thumbnail.dataset.blockType || 'panoramic'; // Default to panoramic for backwards compatibility
 		const altText = thumbnail.dataset.alt;
 
 		// Update modal title
@@ -140,14 +145,31 @@ class PanoramicViewer {
 		const oldError = this.modal.querySelector('.panoramic-error');
 		if (oldError) oldError.remove();
 
+		let imagesData;
+		let imageUrls;
+
+		if (blockType === 'single') {
+			// Handle single panoramic image
+			const imageData = JSON.parse( thumbnail.dataset.image );
+			imagesData = [imageData]; // Convert single image to array for consistent handling
+			imageUrls = [imageData.url];
+		} else {
+			// Handle panoramic block (3 images)
+			imagesData = JSON.parse( thumbnail.dataset.images );
+			imageUrls = imagesData.map(img => img.url);
+		}
+
 		// Check if images have changed
-		const imageUrls = imagesData.map(img => img.url);
 		const shouldRestitch = !this._lastImageUrls || this._lastImageUrls.length !== imageUrls.length || this._lastImageUrls.some((url, i) => url !== imageUrls[i]);
 
 		if (shouldRestitch) {
 			try {
 				await this.loadImages(imagesData);
-				await this.stitchImages();
+				if (blockType === 'single') {
+					await this.setupSingleImage();
+				} else {
+					await this.stitchImages();
+				}
 				this._lastImageUrls = imageUrls;
 			} catch (err) {
 				const errorDiv = document.createElement('div');
@@ -227,6 +249,26 @@ class PanoramicViewer {
 				});
 			})
 		);
+	}
+
+	async setupSingleImage() {
+		if ( this.images.length !== 1 ) return;
+
+		const img = this.images[0];
+
+		// Create canvas for single image (no stitching needed)
+		this.stitchedCanvas = document.createElement( 'canvas' );
+		this.stitchedCanvas.width = img.width;
+		this.stitchedCanvas.height = img.height;
+
+		const ctx = this.stitchedCanvas.getContext( '2d' );
+
+		// Clear canvas with white background
+		ctx.fillStyle = 'white';
+		ctx.fillRect( 0, 0, this.stitchedCanvas.width, this.stitchedCanvas.height );
+
+		// Draw the single image
+		ctx.drawImage( img, 0, 0, img.width, img.height );
 	}
 
 	async stitchImages() {
@@ -353,12 +395,30 @@ class PanoramicViewer {
 	}
 
 	startDrag(e) {
-		this.startPan(e.clientX, e.clientY);
+		this.isMouseDown = true;
+		this.initialMouseX = e.clientX;
+		this.initialMouseY = e.clientY;
+		// Don't start panning immediately - wait for movement
 	}
 	drag(e) {
-		this.dragPan(e.clientX, e.clientY);
+		if (!this.isMouseDown) return;
+
+		const deltaX = e.clientX - this.initialMouseX;
+		const deltaY = e.clientY - this.initialMouseY;
+		const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+		// Only start dragging if mouse has moved beyond threshold
+		if (!this.isDragging && distance > this.dragThreshold) {
+			this.startPan(this.initialMouseX, this.initialMouseY);
+		}
+
+		if (this.isDragging) {
+			e.preventDefault();
+			this.dragPan(e.clientX, e.clientY);
+		}
 	}
 	endDrag() {
+		this.isMouseDown = false;
 		this.endPan();
 	}
 	startTouch(e) {
