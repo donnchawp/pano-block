@@ -43,18 +43,20 @@
 
 /* Frontend styles */
 .wp-block-panoramic-image-block-panoramic,
-.panoramic-image-block-container {
-
-	/* Block-level constraints */
+.wp-block-panoramic-image-block-single-panoramic,
+.panoramic-image-block-container,
+.single-panoramic-image-block-container {
+	/* Block-level constraints - fit post width */
 	width: 100%;
-	max-width: 650px !important;
+	max-width: 100%;
 	box-sizing: border-box;
-	margin: 0 auto;
+	margin: 0 auto 1.5rem;
 	position: relative;
 	contain: layout;
 }
 
-.panoramic-image-block-thumbnail {
+.panoramic-image-block-thumbnail,
+.single-panoramic-image-block-thumbnail {
 	position: relative;
 	cursor: pointer;
 	border-radius: 8px;
@@ -63,6 +65,8 @@
 	max-width: 100%;
 	width: 100%;
 	display: block;
+	/* Smaller thumbnail height */
+	max-height: 200px;
 }
 
 /* Main 3-image thumbnail layout */
@@ -72,6 +76,18 @@
 	height: auto;
 	line-height: 0;
 	font-size: 0;
+	max-height: 200px;
+}
+
+/* Single panoramic image container */
+.single-panoramic-image-container {
+	display: block;
+	width: 100%;
+	height: auto;
+	line-height: 0;
+	font-size: 0;
+	max-height: 200px;
+	overflow: hidden;
 }
 
 .panoramic-image-segment {
@@ -83,7 +99,8 @@
 	line-height: 0;
 }
 
-.panoramic-segment-image {
+.panoramic-segment-image,
+.single-panoramic-image {
 	width: 100%;
 	height: auto;
 	display: block;
@@ -93,21 +110,26 @@
 	vertical-align: top;
 	max-width: none;
 	object-fit: cover;
+	max-height: 200px;
 }
 
 .panoramic-image-block-thumbnail:hover,
-.panoramic-image-block-thumbnail:focus {
+.panoramic-image-block-thumbnail:focus,
+.single-panoramic-image-block-thumbnail:hover,
+.single-panoramic-image-block-thumbnail:focus {
 	transform: translateY(-2px);
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 	outline: none;
 }
 
-.panoramic-image-block-thumbnail:focus {
+.panoramic-image-block-thumbnail:focus,
+.single-panoramic-image-block-thumbnail:focus {
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 
-.panoramic-image-block-thumbnail .panoramic-play-overlay {
+.panoramic-image-block-thumbnail .panoramic-play-overlay,
+.single-panoramic-image-block-thumbnail .single-panoramic-play-overlay {
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -123,13 +145,15 @@
 	transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.panoramic-image-block-thumbnail .panoramic-play-overlay .panoramic-play-icon {
+.panoramic-image-block-thumbnail .panoramic-play-overlay .panoramic-play-icon,
+.single-panoramic-image-block-thumbnail .single-panoramic-play-overlay .single-panoramic-play-icon {
 	color: #fff;
 	font-size: 2rem;
 	line-height: 1;
 }
 
-.panoramic-image-block-thumbnail:hover .panoramic-play-overlay {
+.panoramic-image-block-thumbnail:hover .panoramic-play-overlay,
+.single-panoramic-image-block-thumbnail:hover .single-panoramic-play-overlay {
 	opacity: 1;
 	transform: translate(-50%, -50%) scale(1.1);
 }
@@ -171,6 +195,8 @@
 	cursor: grab;
 	border-radius: 8px;
 	background: #000;
+	user-select: none;
+	-webkit-user-drag: none;
 }
 
 .panoramic-modal .panoramic-viewer-container .panoramic-viewer.dragging {
@@ -181,6 +207,7 @@
 	display: block;
 	max-width: none;
 	max-height: none;
+	pointer-events: none;
 }
 
 .panoramic-modal .panoramic-viewer-container .panoramic-controls {
