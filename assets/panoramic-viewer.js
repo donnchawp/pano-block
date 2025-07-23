@@ -57,22 +57,22 @@ class PanoramicViewer {
 		this.modal.setAttribute( 'aria-labelledby', 'panoramic-viewer-title' );
 
 		this.modal.innerHTML = `
-            <div class="panoramic-viewer-container">
-                <button class="panoramic-close" aria-label="Close panoramic viewer" title="Close (Esc)">&times;</button>
-                <h2 id="panoramic-viewer-title" class="sr-only">Panoramic Image Viewer</h2>
-                <div class="panoramic-viewer" role="img" tabindex="0" aria-describedby="panoramic-instructions">
-                    <canvas></canvas>
-                </div>
-                <div class="panoramic-controls">
-                    <button class="panoramic-zoom-out" aria-label="Zoom out" title="Zoom out (-)">-</button>
-                    <button class="panoramic-zoom-reset" aria-label="Reset zoom" title="Reset zoom (0)">Reset</button>
-                    <button class="panoramic-zoom-in" aria-label="Zoom in" title="Zoom in (+)">+</button>
-                </div>
-                <div id="panoramic-instructions" class="sr-only">
-                    Use arrow keys or drag to pan the image. Use + and - keys or controls to zoom.
-                </div>
-            </div>
-        `;
+			<div class="panoramic-viewer-container">
+				<button class="panoramic-close" aria-label="Close panoramic viewer" title="Close (Esc)">&times;</button>
+				<h2 id="panoramic-viewer-title" class="sr-only">Panoramic Image Viewer</h2>
+				<div class="panoramic-viewer" role="img" tabindex="0" aria-describedby="panoramic-instructions">
+					<canvas></canvas>
+				</div>
+				<div class="panoramic-controls">
+					<button class="panoramic-zoom-out" aria-label="Zoom out" title="Zoom out (-)">-</button>
+					<button class="panoramic-zoom-reset" aria-label="Reset zoom" title="Reset zoom (0)">Reset</button>
+					<button class="panoramic-zoom-in" aria-label="Zoom in" title="Zoom in (+)">+</button>
+				</div>
+				<div id="panoramic-instructions" class="sr-only">
+					Use arrow keys or drag to pan the image. Use + and - keys or controls to zoom.
+				</div>
+			</div>
+		`;
 
 		document.body.appendChild( this.modal );
 
@@ -550,22 +550,22 @@ class PanoramicViewer {
 
 // Add screen reader only styles
 if (!document.getElementById('pano-sr-only-style')) {
-    const srOnlyStyle = document.createElement('style');
-    srOnlyStyle.id = 'pano-sr-only-style';
-    srOnlyStyle.textContent = `
-        .sr-only {
-            position: absolute !important;
-            width: 1px !important;
-            height: 1px !important;
-            padding: 0 !important;
-            margin: -1px !important;
-            overflow: hidden !important;
-            clip: rect(0, 0, 0, 0) !important;
-            white-space: nowrap !important;
-            border: 0 !important;
-        }
-    `;
-    document.head.appendChild(srOnlyStyle);
+	const srOnlyStyle = document.createElement('style');
+	srOnlyStyle.id = 'pano-sr-only-style';
+	srOnlyStyle.textContent = `
+		.sr-only {
+			position: absolute !important;
+			width: 1px !important;
+			height: 1px !important;
+			padding: 0 !important;
+			margin: -1px !important;
+			overflow: hidden !important;
+			clip: rect(0, 0, 0, 0) !important;
+			white-space: nowrap !important;
+			border: 0 !important;
+		}
+	`;
+	document.head.appendChild(srOnlyStyle);
 }
 
 // Export PanoramicViewer for explicit initialization
@@ -573,14 +573,14 @@ window.PanoramicViewer = PanoramicViewer;
 
 // Optionally, provide a global function to initialize the viewer if needed
 window.initPanoramicViewer = function() {
-    if (!window._panoViewerInstance) {
-        window._panoViewerInstance = new PanoramicViewer();
-    }
-    return window._panoViewerInstance;
+	if (!window._panoViewerInstance) {
+		window._panoViewerInstance = new PanoramicViewer();
+	}
+	return window._panoViewerInstance;
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    if (!window._panoViewerInstance) {
-        window._panoViewerInstance = window.initPanoramicViewer();
-    }
+	if (!window._panoViewerInstance) {
+		window._panoViewerInstance = window.initPanoramicViewer();
+	}
 });
