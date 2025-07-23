@@ -61,7 +61,7 @@ npm run plugin-zip-folder
 - Follows WordPress Block API v3 standards
 - Server-side rendering with `render_callback`
 - Proper enqueueing of scripts/styles only when block is present
-- Internationalization ready with text domain `panoromic-image-block`
+- Internationalization ready with text domain `panoramic-image-block`
 
 ## Browser Requirements
 - Canvas API support required for image stitching
