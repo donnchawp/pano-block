@@ -460,13 +460,18 @@ class Panoramic_Image_Block {
 					// Progressive loading
 					'loadingPreview'    => __( 'Loading preview...', 'panoramic-image-block' ),
 					'loadingHighRes'    => __( 'Loading high resolution...', 'panoramic-image-block' ),
+					// Translators: %d is the number of thumbnails loaded.
 					'thumbnailsLoaded'  => _n_noop( '%d thumbnail loaded', '%d thumbnails loaded', 'panoramic-image-block' ),
+					// Translators: %d is the number of images loaded.
 					'imagesLoaded'      => _n_noop( '%d image loaded', '%d images loaded', 'panoramic-image-block' ),
 
 					// Accessibility announcements
 					'imageLoaded'       => __( 'Panoramic image loaded successfully', 'panoramic-image-block' ),
+					// Translators: %d is the zoom level.
 					'zoomedIn'          => __( 'Zoomed in to %d%%', 'panoramic-image-block' ),
+					// Translators: %d is the zoom level.
 					'zoomedOut'         => __( 'Zoomed out to %d%%', 'panoramic-image-block' ),
+					// Translators: %d is the zoom level.
 					'viewReset'         => __( 'View reset. Zoom: %d%%, centered', 'panoramic-image-block' ),
 				),
 			)
